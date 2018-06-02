@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="me.jdowns.matter">
 
-    <application android:allowBackup="true" android:fullBackupContent="true" android:icon="@mipmap/ic_launcher"
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:name=".Matter"
+        android:allowBackup="true"
+        android:fullBackupContent="true"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/appName" android:roundIcon="@mipmap/ic_launcher_round" android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="net.dean.jraw.android.REDDIT_USERNAME"
+            android:value="PiwwowPants" />
+        <meta-data
+            android:name="net.dean.jraw.android.CLIENT_ID"
+            android:value="6kt2pSwz_wm1Uw" />
+        <meta-data
+            android:name="net.dean.jraw.android.REDIRECT_URL"
+            android:value="https://github.com/Piwwowpants" />
         <activity android:name=".views.activities.MainActivity" android:label="@string/appName">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

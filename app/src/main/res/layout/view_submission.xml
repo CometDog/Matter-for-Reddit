@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/submission_layout_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/submission_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:text="@string/placeholder_submission_username" />
+
+        <TextView
+            android:id="@+id/submission_post_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toRightOf="@id/submission_username"
+            android:text="@string/placeholder_submission_post_time" />
+
+        <TextView
+            android:id="@+id/submission_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toRightOf="@+id/submission_post_time"
+            android:text="@string/placeholder_submission_type" />
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/submission_layout_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/submission_layout_info">
+
+        <TextView
+            android:id="@+id/submission_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/placeholder_submission_title" />
+
+        <TextView
+            android:id="@+id/submission_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/submission_title"
+            android:text="@string/placeholder_submission_tag" />
+
+        <ImageButton
+            android:id="@+id/submission_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/submission_tag"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_broken_image_24dp"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/submission_image" />
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/submission_layout_actions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/submission_layout_content">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/submission_layout_voting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/submission_upvote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_arrow_upward_24dp"
+                android:contentDescription="@string/upvote" />
+
+            <TextView
+                android:id="@+id/submission_vote_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toRightOf="@id/submission_upvote"
+                android:text="@string/placeholder_submission_vote_count" />
+
+            <ImageButton
+                android:id="@+id/submission_downvote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:layout_constraintLeft_toRightOf="@id/submission_vote_count"
+                android:src="@drawable/ic_arrow_downward_24dp"
+                android:contentDescription="@string/downvote" />
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/submission_layout_comments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toRightOf="@id/submission_layout_voting"
+            app:layout_constraintRight_toLeftOf="@+id/submission_layout_share">
+
+            <ImageView
+                android:id="@+id/submission_comment_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_forum_24dp"
+                android:contentDescription="@string/comments" />
+
+            <TextView
+                android:id="@+id/submission_comment_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toRightOf="@id/submission_comment_icon"
+                android:text="@string/placeholder_submission_comment_count" />
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/submission_layout_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintRight_toRightOf="parent">
+
+            <ImageView
+                android:id="@+id/submission_share_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_share_24dp"
+                android:contentDescription="@string/share" />
+
+            <TextView
+                android:id="@+id/submission_share_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toRightOf="@id/submission_share_icon"
+                android:text="@string/share" />
+        </android.support.constraint.ConstraintLayout>
+    </android.support.constraint.ConstraintLayout>
+</android.support.constraint.ConstraintLayout>

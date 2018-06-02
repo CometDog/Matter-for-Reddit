@@ -14,6 +14,7 @@
         style="@style/CustomActionBarImageButtonStyle" />
 
     <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/action_bar_title"
         android:text="@string/appName"
         app:layout_constraintLeft_toRightOf="@id/action_bar_search"
         app:layout_constraintRight_toLeftOf="@id/action_bar_profile"
