@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_all"
+        android:icon="@drawable/ic_whatshot_24dp"
+        android:title="@string/all" />
+
+    <item
+        android:id="@+id/navigation_subreddits"
+        android:icon="@drawable/ic_vertical_split_24dp"
+        android:title="@string/subreddits" />
+
+</menu>

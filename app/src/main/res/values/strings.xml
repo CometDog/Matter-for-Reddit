@@ -1,0 +1,7 @@
+<resources>
+    <string name="appName">Matter</string>
+    <string name="all">All</string>
+    <string name="subreddits">Subreddits</string>
+    <string name="search">Search</string>
+    <string name="profile">Profile</string>
+</resources>

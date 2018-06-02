@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    style="@style/CustomActionBarStyle">
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/action_bar_search"
+        android:src="@drawable/ic_search_24dp"
+        android:contentDescription="@string/search"
+        app:layout_constraintLeft_toLeftOf="parent"
+        style="@style/CustomActionBarImageButtonStyle" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:text="@string/appName"
+        app:layout_constraintLeft_toRightOf="@id/action_bar_search"
+        app:layout_constraintRight_toLeftOf="@id/action_bar_profile"
+        style="@style/CustomActionBarTitleStyle" />
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/action_bar_profile"
+        android:src="@drawable/ic_person_24dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:contentDescription="@string/profile"
+        style="@style/CustomActionBarImageButtonStyle" />
+
+</android.support.constraint.ConstraintLayout>
