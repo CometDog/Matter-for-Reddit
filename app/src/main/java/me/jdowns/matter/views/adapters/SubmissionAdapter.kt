@@ -18,23 +18,63 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Adapter<SubmissionAdapter.ViewHolder>() {
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val usernameTextView = view.findViewById<TextView>(R.id.submission_username)
-        val postTimeTextView = view.findViewById<TextView>(R.id.submission_post_time)
-        val typeTextView = view.findViewById<TextView>(R.id.submission_type)
-        val titleTextView = view.findViewById<TextView>(R.id.submission_title)
-        val tagTextView = view.findViewById<TextView>(R.id.submission_tag)
-        val imageImageButton = view.findViewById<ImageButton>(R.id.submission_image)
-        val upvoteImageButton = view.findViewById<ImageButton>(R.id.submission_upvote)
-        val voteCountTextView = view.findViewById<TextView>(R.id.submission_vote_count)
-        val downvoteImageButton = view.findViewById<ImageButton>(R.id.submission_downvote)
-        val commentCountTextView = view.findViewById<TextView>(R.id.submission_comment_count)
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnLongClickListener {
+        val usernameTextView = view.findViewById<TextView>(R.id.submission_username)!!
+        val postTimeTextView = view.findViewById<TextView>(R.id.submission_post_time)!!
+        val typeTextView = view.findViewById<TextView>(R.id.submission_type)!!
+        val typeSeparator = view.findViewById<ViewGroup>(R.id.submission_type_separator)!!
+        val titleTextView = view.findViewById<TextView>(R.id.submission_title)!!
+        val subredditTextView = view.findViewById<TextView>(R.id.submission_subreddit)!!
+        val subredditSeparator = view.findViewById<ViewGroup>(R.id.submission_subreddit_separator)!!
+        val tagTextView = view.findViewById<TextView>(R.id.submission_tag)!!
+        val imageImageButton = view.findViewById<ImageButton>(R.id.submission_image)!!
+        val actionsLayout = view.findViewById<ViewGroup>(R.id.submission_layout_actions)
+        val upvoteImageButton = view.findViewById<ImageButton>(R.id.submission_upvote)!!
+        val voteCountTextView = view.findViewById<TextView>(R.id.submission_vote_count)!!
+        val downvoteImageButton = view.findViewById<ImageButton>(R.id.submission_downvote)!!
+        val commentCountTextView = view.findViewById<TextView>(R.id.submission_comment_count)!!
+
+        private var actionsLayoutHeight = 0F
 
         init {
-            if (!Matter.accountHelper.isAuthenticated()) {
-                upvoteImageButton.visibility = View.GONE
-                downvoteImageButton.visibility = View.GONE
+            if (Matter.accountHelper.isAuthenticated()) {
+                upvoteImageButton.visibility = View.VISIBLE
+                downvoteImageButton.visibility = View.VISIBLE
             }
+            view.post {
+                actionsLayoutHeight = actionsLayout.height.toFloat() / 4
+                actionsLayout.apply {
+                    visibility = View.GONE
+                    alpha = 0.0f
+                    translationY = -actionsLayoutHeight
+                }
+                actionsLayout.visibility = View.GONE
+                view.setOnLongClickListener(this)
+            }
+        }
+
+        override fun onLongClick(view: View): Boolean {
+            view.setOnLongClickListener({
+                if (actionsLayout.visibility == View.GONE) {
+                    actionsLayout.apply {
+                        animate()
+                            .translationY(actionsLayoutHeight)
+                            .alpha(1.0f)
+                            .setListener(null)
+                            .withStartAction { visibility = View.VISIBLE }
+                    }
+                } else {
+                    actionsLayout.apply {
+                        animate()
+                            .translationY(-actionsLayoutHeight)
+                            .alpha(0.0f)
+                            .setListener(null)
+                            .withEndAction { visibility = View.GONE }
+                    }
+                }
+                true
+            })
+            return true
         }
     }
 
@@ -42,19 +82,57 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
         ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.view_submission, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val submission = dataSet[position]
+        with(dataSet[position]) {
+            setUsername(holder, this)
+            setPostTime(holder, this)
+            setType(holder, this)
+            setTitle(holder, this)
+            setSubreddit(holder, this)
+            setFlair(holder, this)
+            setThumbnail(holder, this)
+            setScore(holder, this)
+            setCommentCount(holder, this)
+        }
+    }
+
+    private fun setUsername(holder: ViewHolder, submission: Submission) {
         holder.usernameTextView.text = submission.author
+    }
+
+    private fun setPostTime(holder: ViewHolder, submission: Submission) {
         with(getTimeDiff(submission.created)) {
             holder.postTimeTextView.text = first.toString().plus(second)
         }
-        holder.typeTextView.text = submission.postHint
-        holder.titleTextView.text = submission.title
-        if (submission.linkFlairText.isNullOrBlank()) {
-            holder.tagTextView.visibility = View.GONE
-        } else {
-            holder.tagTextView.text = submission.linkFlairText
+    }
+
+    private fun setType(holder: ViewHolder, submission: Submission) {
+        if (!submission.isSelfPost) {
+            holder.typeTextView.visibility = View.VISIBLE
+            holder.typeSeparator.visibility = View.VISIBLE
+            holder.typeTextView.text = submission.postHint
         }
-        if (submission.hasThumbnail() && !submission.thumbnail.isNullOrBlank()) {
+    }
+
+    private fun setTitle(holder: ViewHolder, submission: Submission) {
+        holder.titleTextView.text = submission.title
+    }
+
+    private fun setSubreddit(holder: ViewHolder, submission: Submission) {
+        holder.subredditTextView.text =
+                holder.subredditTextView.context.resources.getString(R.string.subreddit_qualifier, submission.subreddit)
+    }
+
+    private fun setFlair(holder: ViewHolder, submission: Submission) {
+        if (!submission.linkFlairCssClass.isNullOrBlank()) {
+            holder.tagTextView.visibility = View.VISIBLE
+            holder.subredditSeparator.visibility = View.VISIBLE
+            holder.tagTextView.text = submission.linkFlairCssClass
+        }
+    }
+
+    private fun setThumbnail(holder: ViewHolder, submission: Submission) {
+        if (!submission.isSelfPost && submission.hasThumbnail() && !submission.thumbnail.isNullOrBlank()) {
+            holder.imageImageButton.visibility = View.VISIBLE
             async(UI) {
                 holder.imageImageButton.setImageDrawable(
                     async {
@@ -65,14 +143,18 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
                     }.await()
                 )
             }
-        } else {
-            holder.imageImageButton.visibility = View.GONE
         }
+    }
+
+    private fun setScore(holder: ViewHolder, submission: Submission) {
         if (submission.isScoreHidden) {
             holder.voteCountTextView.text = "?"
         } else {
             holder.voteCountTextView.text = submission.score.toString()
         }
+    }
+
+    private fun setCommentCount(holder: ViewHolder, submission: Submission) {
         holder.commentCountTextView.text = submission.commentCount.toString()
     }
 

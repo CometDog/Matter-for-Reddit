@@ -10,12 +10,19 @@
     <string name="comments">Comments</string>
     <string name="share">Share</string>
 
+    <!-- Reddit templates -->
+    <string name="subreddit_qualifier">/r/%s</string>
+
     <!-- Placeholders -->
     <string name="placeholder_submission_username">/u/PiwwowPants</string>
     <string name="placeholder_submission_post_time">6h</string>
     <string name="placeholder_submission_type">i.redd.it</string>
     <string name="placeholder_submission_title">Welcome to Matter for Reddit</string>
+    <string name="placeholder_submission_subreddit">/r/cats</string>
     <string name="placeholder_submission_tag">Developer</string>
     <string name="placeholder_submission_vote_count">593</string>
     <string name="placeholder_submission_comment_count">31</string>
+
+    <!-- Other -->
+    <string name="separator">Separator</string>
 </resources>
