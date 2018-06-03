@@ -22,6 +22,8 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Adapter<SubmissionAdapter.ViewHolder>() {
+    lateinit var listener: SubmissionRecyclerViewListener
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val usernameTextView = view.findViewById<TextView>(R.id.submission_username)!!
         val postTimeTextView = view.findViewById<TextView>(R.id.submission_post_time)!!
@@ -65,6 +67,10 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
             setThumbnail(holder, this)
             setScore(holder, this)
             setCommentCount(holder, this)
+        }
+
+        if (position == dataSet.size - 1) {
+            listener.atBottom()
         }
     }
 
@@ -157,6 +163,10 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
                 else -> Pair(TimeUnit.DAYS.convert(this, TimeUnit.SECONDS) / 365, "y")
             }
         }
+    }
+
+    interface SubmissionRecyclerViewListener {
+        fun atBottom()
     }
 
     companion object {

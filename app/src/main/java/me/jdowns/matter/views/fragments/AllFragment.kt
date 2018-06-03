@@ -16,8 +16,10 @@ import me.jdowns.matter.Matter
 import me.jdowns.matter.R
 import me.jdowns.matter.views.adapters.SubmissionAdapter
 import net.dean.jraw.models.Submission
+import net.dean.jraw.pagination.DefaultPaginator
 
 class AllFragment : Fragment() {
+    private lateinit var paginator: DefaultPaginator<Submission>
     private lateinit var recyclerView: RecyclerView
     private val dataSet: MutableList<Submission> = mutableListOf()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -27,37 +29,49 @@ class AllFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_all).apply {
-            adapter = SubmissionAdapter(dataSet)
+            adapter = SubmissionAdapter(dataSet).apply {
+                listener = object : SubmissionAdapter.SubmissionRecyclerViewListener {
+                    override fun atBottom() {
+                        getNextPage()
+                    }
+                }
+            }
             layoutManager = LinearLayoutManager(context).apply {
                 orientation = LinearLayout.VERTICAL
             }
         }
+        getNextPage(true)
+    }
 
-        /** TODO: Implement full OAuth */
-        // This is used for general testing
+    private fun getNextPage(firstPage: Boolean = false) {
         async {
-            dataSet.addAll(Matter.accountHelper.switchToUserless().subreddit("all").posts().limit(25).build().next())
+            if (!::paginator.isInitialized) {
+                /** TODO: Implement full OAuth */
+                // This is used for general testing
+                paginator = Matter.accountHelper.switchToUserless().subreddit("all").posts().limit(25).build()
+            }
+            val newDataSet = paginator.next()
+            dataSet.addAll(newDataSet)
             launch(UI) {
-                stopInitialLoading()
-                recyclerView.adapter.notifyItemRangeInserted(recyclerView.adapter.itemCount, dataSet.size - 1)
+                if (firstPage) {
+                    stopInitialLoading()
+                }
+                recyclerView.adapter.notifyItemRangeInserted(recyclerView.adapter.itemCount, newDataSet.size - 1)
             }
         }
+
     }
 
     private fun stopInitialLoading() {
-        stopLoading()
+        with(view!!.findViewById<ProgressBar>(R.id.fragment_all_initial_progress_bar)) {
+            animate()
+                .alpha(0.0f)
+                .withEndAction { visibility = View.GONE }
+        }
         with(recyclerView) {
             animate()
                 .withStartAction { visibility = View.VISIBLE }
                 .alpha(1.0F)
-        }
-    }
-
-    private fun stopLoading() {
-        with(view!!.findViewById<ProgressBar>(R.id.fragment_all_progress_bar)) {
-            animate()
-                .alpha(0.0f)
-                .withEndAction { visibility = View.GONE }
         }
     }
 
