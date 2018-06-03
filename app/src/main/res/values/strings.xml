@@ -12,6 +12,7 @@
 
     <!-- Reddit templates -->
     <string name="subreddit_qualifier">/r/%s</string>
+    <string name="username_qualifier">/u/%s</string>
 
     <!-- Placeholders -->
     <string name="placeholder_submission_username">/u/PiwwowPants</string>

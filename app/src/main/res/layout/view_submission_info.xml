@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/submission_layout_info"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp">
+
+    <TextView
+        android:id="@+id/submission_type"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/submission_type_separator"
+        android:text="@string/placeholder_submission_type"
+        android:textSize="14sp"
+        android:layout_margin="4dp"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/submission_type_separator"
+        layout="@layout/dot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/submission_type"
+        app:layout_constraintRight_toLeftOf="@id/submission_post_time"
+        android:layout_margin="4dp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/submission_post_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/submission_type_separator"
+        app:layout_constraintRight_toLeftOf="@id/submission_post_time_separator"
+        android:text="@string/placeholder_submission_post_time"
+        android:layout_margin="4dp"
+        android:textSize="14sp" />
+
+    <include
+        android:id="@+id/submission_post_time_separator"
+        layout="@layout/dot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/submission_post_time"
+        app:layout_constraintRight_toLeftOf="@id/submission_username"
+        android:layout_margin="4dp" />
+
+    <TextView
+        android:id="@+id/submission_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/submission_post_time_separator"
+        app:layout_constraintRight_toRightOf="parent"
+        android:text="@string/placeholder_submission_username"
+        android:layout_margin="4dp"
+        android:textSize="14sp" />
+</android.support.constraint.ConstraintLayout>

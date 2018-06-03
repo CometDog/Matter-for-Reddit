@@ -1,11 +1,13 @@
 package me.jdowns.matter.views.adapters
 
 import android.graphics.drawable.Drawable
+import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
@@ -18,7 +20,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Adapter<SubmissionAdapter.ViewHolder>() {
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnLongClickListener {
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val usernameTextView = view.findViewById<TextView>(R.id.submission_username)!!
         val postTimeTextView = view.findViewById<TextView>(R.id.submission_post_time)!!
         val typeTextView = view.findViewById<TextView>(R.id.submission_type)!!
@@ -27,54 +29,19 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
         val subredditTextView = view.findViewById<TextView>(R.id.submission_subreddit)!!
         val subredditSeparator = view.findViewById<ViewGroup>(R.id.submission_subreddit_separator)!!
         val tagTextView = view.findViewById<TextView>(R.id.submission_tag)!!
-        val imageImageButton = view.findViewById<ImageButton>(R.id.submission_image)!!
+        val imageCardView = view.findViewById<CardView>(R.id.submission_image_card_view)!!
+        val thumbnailImageView = view.findViewById<ImageView>(R.id.submission_thumbnail)!!
         val actionsLayout = view.findViewById<ViewGroup>(R.id.submission_layout_actions)
         val upvoteImageButton = view.findViewById<ImageButton>(R.id.submission_upvote)!!
         val voteCountTextView = view.findViewById<TextView>(R.id.submission_vote_count)!!
         val downvoteImageButton = view.findViewById<ImageButton>(R.id.submission_downvote)!!
         val commentCountTextView = view.findViewById<TextView>(R.id.submission_comment_count)!!
 
-        private var actionsLayoutHeight = 0F
-
         init {
             if (Matter.accountHelper.isAuthenticated()) {
                 upvoteImageButton.visibility = View.VISIBLE
                 downvoteImageButton.visibility = View.VISIBLE
             }
-            view.post {
-                actionsLayoutHeight = actionsLayout.height.toFloat() / 4
-                actionsLayout.apply {
-                    visibility = View.GONE
-                    alpha = 0.0f
-                    translationY = -actionsLayoutHeight
-                }
-                actionsLayout.visibility = View.GONE
-                view.setOnLongClickListener(this)
-            }
-        }
-
-        override fun onLongClick(view: View): Boolean {
-            view.setOnLongClickListener({
-                if (actionsLayout.visibility == View.GONE) {
-                    actionsLayout.apply {
-                        animate()
-                            .translationY(actionsLayoutHeight)
-                            .alpha(1.0f)
-                            .setListener(null)
-                            .withStartAction { visibility = View.VISIBLE }
-                    }
-                } else {
-                    actionsLayout.apply {
-                        animate()
-                            .translationY(-actionsLayoutHeight)
-                            .alpha(0.0f)
-                            .setListener(null)
-                            .withEndAction { visibility = View.GONE }
-                    }
-                }
-                true
-            })
-            return true
         }
     }
 
@@ -96,7 +63,8 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
     }
 
     private fun setUsername(holder: ViewHolder, submission: Submission) {
-        holder.usernameTextView.text = submission.author
+        holder.usernameTextView.text =
+                holder.usernameTextView.resources.getString(R.string.username_qualifier, submission.author)
     }
 
     private fun setPostTime(holder: ViewHolder, submission: Submission) {
@@ -131,10 +99,13 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
     }
 
     private fun setThumbnail(holder: ViewHolder, submission: Submission) {
-        if (!submission.isSelfPost && submission.hasThumbnail() && !submission.thumbnail.isNullOrBlank()) {
-            holder.imageImageButton.visibility = View.VISIBLE
+        if (!submission.isSelfPost && submission.hasThumbnail() && !submission.thumbnail.isNullOrBlank() && submission.thumbnail!!.matches(
+                Regex("^http.?://.*")
+            )
+        ) {
+            holder.imageCardView.visibility = View.VISIBLE
             async(UI) {
-                holder.imageImageButton.setImageDrawable(
+                holder.thumbnailImageView.setImageDrawable(
                     async {
                         Drawable.createFromStream(
                             URL(submission.thumbnail).content as InputStream,
@@ -143,6 +114,8 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
                     }.await()
                 )
             }
+        } else {
+            holder.imageCardView.visibility = View.GONE
         }
     }
 
