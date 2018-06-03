@@ -9,13 +9,16 @@
     <string name="downvote">Downvote</string>
     <string name="comments">Comments</string>
     <string name="share">Share</string>
+    <string name="settings">Settings</string>
+    <string name="username">Username</string>
+    <string name="log_in">Log In</string>
 
     <!-- Reddit templates -->
     <string name="subreddit_qualifier">/r/%s</string>
     <string name="username_qualifier">/u/%s</string>
 
     <!-- Placeholders -->
-    <string name="placeholder_submission_username">/u/PiwwowPants</string>
+    <string name="placeholder_username">/u/PiwwowPants</string>
     <string name="placeholder_submission_post_time">6h</string>
     <string name="placeholder_submission_type">i.redd.it</string>
     <string name="placeholder_submission_title">Welcome to Matter for Reddit</string>

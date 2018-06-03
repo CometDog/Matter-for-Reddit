@@ -1,4 +1,4 @@
-package me.jdowns.matter.helpers
+package me.jdowns.matter.utils
 
 import android.graphics.Bitmap
 import android.util.LruCache

@@ -9,8 +9,11 @@ import net.dean.jraw.android.SharedPreferencesTokenStore
 import net.dean.jraw.android.SimpleAndroidLogAdapter
 import net.dean.jraw.http.SimpleHttpLogger
 import net.dean.jraw.oauth.AccountHelper
+import net.dean.jraw.oauth.AuthMethod
 import java.util.*
 
+/** TODO: Investigate address fault on start up */
+// Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x18 in tid 31986 (onPool-worker-2), pid 31887 (e.jdowns.matter)
 class Matter : Application() {
     override fun onCreate() {
         super.onCreate()
@@ -35,5 +38,8 @@ class Matter : Application() {
     companion object {
         lateinit var accountHelper: AccountHelper
         lateinit var tokenStore: SharedPreferencesTokenStore
+
+        fun isRealUser(): Boolean =
+            accountHelper.isAuthenticated() && accountHelper.reddit.authMethod != AuthMethod.USERLESS_APP
     }
 }

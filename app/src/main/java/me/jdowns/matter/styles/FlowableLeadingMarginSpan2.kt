@@ -1,4 +1,4 @@
-package me.jdowns.matter.helpers
+package me.jdowns.matter.styles
 
 import android.graphics.Canvas
 import android.graphics.Paint

@@ -18,8 +18,8 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import me.jdowns.matter.Matter
 import me.jdowns.matter.R
-import me.jdowns.matter.helpers.BitmapLruCache
-import me.jdowns.matter.helpers.FlowableLeadingMarginSpan2
+import me.jdowns.matter.styles.FlowableLeadingMarginSpan2
+import me.jdowns.matter.utils.BitmapLruCache
 import net.dean.jraw.models.Submission
 import java.io.InputStream
 import java.net.URL
@@ -48,7 +48,7 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
         val commentCountTextView = view.findViewById<TextView>(R.id.submission_comment_count)!!
 
         init {
-            if (Matter.accountHelper.isAuthenticated()) {
+            if (Matter.isRealUser()) {
                 upvoteImageButton.visibility = View.VISIBLE
                 downvoteImageButton.visibility = View.VISIBLE
             }

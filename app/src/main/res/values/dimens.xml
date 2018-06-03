@@ -4,4 +4,5 @@
     <dimen name="action_bar_image_button_padding">8dp</dimen>
     <dimen name="action_bar_title_padding">8dp</dimen>
     <dimen name="submission_card_view_size">80dp</dimen>
+    <dimen name="profile_image_size">32dp</dimen>
 </resources>

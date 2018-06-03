@@ -58,7 +58,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toRightOf="@id/submission_post_time_separator"
         app:layout_constraintRight_toRightOf="parent"
-        android:text="@string/placeholder_submission_username"
+        android:text="@string/placeholder_username"
         android:layout_margin="4dp"
         android:textSize="14sp" />
 </android.support.constraint.ConstraintLayout>
