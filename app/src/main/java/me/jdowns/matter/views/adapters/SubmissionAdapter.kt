@@ -6,7 +6,6 @@ import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.text.SpannableString
 import android.util.DisplayMetrics
-import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +17,7 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import me.jdowns.matter.Matter
 import me.jdowns.matter.R
+import me.jdowns.matter.helpers.BitmapLruCache
 import me.jdowns.matter.helpers.FlowableLeadingMarginSpan2
 import net.dean.jraw.models.Submission
 import java.io.InputStream
@@ -28,7 +28,7 @@ import kotlin.math.ceil
 
 class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Adapter<SubmissionAdapter.ViewHolder>() {
     lateinit var listener: SubmissionRecyclerViewListener
-
+    private val thumbnailCache = BitmapLruCache()
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val submissionCardViewLayout = view.findViewById<ViewGroup>(R.id.submission_card_view_layout)!!
         val usernameTextView = view.findViewById<TextView>(R.id.submission_username)!!
@@ -147,34 +147,29 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
         }
     }
 
-    /** TODO: Guarantee the ViewHolder has not changed before setting the bitmap */
     private fun setThumbnail(holder: ViewHolder, submission: Submission) {
         if (!submission.isSelfPost && submission.hasThumbnail() && !submission.thumbnail.isNullOrBlank() && submission.thumbnail!!.matches(
                 Regex("^http.?://.*")
             )
         ) {
-            async(UI) {
-                holder.thumbnailImageView.setImageBitmap(
-                    async {
-                        val bitmapFromCache = getBitmapFromCache(submission.thumbnail!!)
-                        if (bitmapFromCache == null) {
-                            val newBitmap = BitmapFactory.decodeStream(
-                                URL(submission.thumbnail).content as InputStream
-                            )
-                            addBitmapToCache(
-                                submission.thumbnail!!, newBitmap
-                            )
-                            newBitmap
-                        } else {
-                            Bitmap.createBitmap(bitmapFromCache)
-                        }
-                    }.await()
-                )
-                holder.imageCardView.apply {
-                    visibility = View.VISIBLE
-
+            async {
+                val bitmap = with(thumbnailCache.get(submission.uniqueId)) {
+                    if (this == null) {
+                        BitmapFactory.decodeStream(URL(submission.thumbnail).content as InputStream)
+                    } else {
+                        Bitmap.createBitmap(this)
+                    }
                 }
-                adjustTitle(holder, submission)
+                async(UI) {
+                    if (holder.oldPosition == -1 || holder.oldPosition == holder.layoutPosition) {
+                        holder.thumbnailImageView.setImageBitmap(bitmap)
+                        holder.imageCardView.visibility = View.VISIBLE
+                        adjustTitle(holder, submission)
+                        thumbnailCache.put(
+                            submission.uniqueId, bitmap
+                        )
+                    }
+                }
             }
         } else {
             holder.imageCardView.visibility = View.GONE
@@ -210,19 +205,5 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
 
     interface SubmissionRecyclerViewListener {
         fun atBottom()
-    }
-
-    companion object {
-        /** TODO: Cache based on memory usage instead of cache size */
-        private val thumbnailCache = LruCache<String, Bitmap>(25)
-        private fun addBitmapToCache(key: String, bitmap: Bitmap) {
-            if (getBitmapFromCache(key) == null) {
-                thumbnailCache.put(key, bitmap)
-            }
-        }
-
-        private fun getBitmapFromCache(key: String): Bitmap? {
-            return thumbnailCache.get(key) ?: null
-        }
     }
 }
