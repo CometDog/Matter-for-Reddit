@@ -110,6 +110,7 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
         }
     }
 
+    /** TODO: Guarantee the ViewHolder has not changed before setting the bitmap */
     private fun setThumbnail(holder: ViewHolder, submission: Submission) {
         if (!submission.isSelfPost && submission.hasThumbnail() && !submission.thumbnail.isNullOrBlank() && submission.thumbnail!!.matches(
                 Regex("^http.?://.*")
