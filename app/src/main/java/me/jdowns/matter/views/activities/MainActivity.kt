@@ -3,7 +3,7 @@ package me.jdowns.matter.views.activities
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import me.jdowns.matter.R
-import me.jdowns.matter.views.fragments.AllFragment
+import me.jdowns.matter.views.fragments.SubmissionFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.fragment_main, AllFragment(), AllFragment.FRAGMENT_TAG)
+            .replace(R.id.fragment_main, SubmissionFragment.newInstance("all"), SubmissionFragment.FRAGMENT_TAG)
             .commit()
     }
 }

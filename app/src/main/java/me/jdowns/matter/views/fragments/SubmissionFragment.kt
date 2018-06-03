@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
@@ -18,27 +19,35 @@ import me.jdowns.matter.views.adapters.SubmissionAdapter
 import net.dean.jraw.models.Submission
 import net.dean.jraw.pagination.DefaultPaginator
 
-class AllFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener, SubmissionAdapter.SubmissionRecyclerViewListener {
+class SubmissionFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener,
+    SubmissionAdapter.SubmissionRecyclerViewListener {
     private var paginator: DefaultPaginator<Submission>? = null
     private lateinit var recyclerView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private val dataSet: MutableList<Submission> = mutableListOf()
+    private lateinit var subreddit: String
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_all, container, false)
+        return inflater.inflate(R.layout.fragment_submission, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_all).apply {
+
+        subreddit = arguments?.getString(SUBREDDIT_KEY) ?: "all"
+        activity?.findViewById<TextView>(R.id.action_bar_title)?.text =
+                getString(R.string.subreddit_qualifier, subreddit)
+
+        recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_submission).apply {
             adapter = SubmissionAdapter(dataSet).apply {
-                listener = this@AllFragment
+                listener = this@SubmissionFragment
             }
             layoutManager = LinearLayoutManager(context).apply {
                 orientation = LinearLayout.VERTICAL
             }
         }
-        swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout_view_all).apply {
-            setOnRefreshListener(this@AllFragment)
+        swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout_view_submission).apply {
+            setOnRefreshListener(this@SubmissionFragment)
             post {
                 isRefreshing = true
                 onRefresh()
@@ -50,7 +59,7 @@ class AllFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener, Submission
 
     override fun onRefresh() {
         if (dataSet.size > 0) {
-            /** TODO: Resolve why calling clear on the data set caused an index out of bounds */
+            /** TODO: Resolve why calling clear on the data set causes an index out of bounds */
             val tempDataSet = mutableListOf<Submission>()
             tempDataSet.addAll(dataSet)
             for (submission in tempDataSet) {
@@ -71,7 +80,7 @@ class AllFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener, Submission
             if (paginator == null) {
                 /** TODO: Implement full OAuth */
                 // This is used for general testing
-                paginator = Matter.accountHelper.switchToUserless().subreddit("all").posts().limit(25).build()
+                paginator = Matter.accountHelper.switchToUserless().subreddit(subreddit).posts().limit(25).build()
             }
             val newDataSet = paginator!!.next()
             dataSet.addAll(newDataSet)
@@ -93,6 +102,12 @@ class AllFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener, Submission
     }
 
     companion object {
-        const val FRAGMENT_TAG = "allFragmentTag"
+        const val FRAGMENT_TAG = "submissionFragmentTag"
+        private const val SUBREDDIT_KEY = "subredditKey"
+        fun newInstance(subreddit: String): SubmissionFragment = SubmissionFragment().apply {
+            arguments = Bundle().apply {
+                putString(SUBREDDIT_KEY, subreddit)
+            }
+        }
     }
 }

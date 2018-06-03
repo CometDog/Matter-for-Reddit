@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import me.jdowns.matter.Matter
 import me.jdowns.matter.R
 import me.jdowns.matter.helpers.BitmapLruCache
@@ -63,7 +64,7 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
         ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.view_submission, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        hideCardView(holder)
+        holder.submissionCardViewLayout.visibility = View.INVISIBLE
 
         with(dataSet[position]) {
             setUsername(holder, this)
@@ -81,14 +82,6 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
         if (position == dataSet.size - 1) {
             listener.atBottom()
         }
-    }
-
-    private fun showCardView(holder: ViewHolder) {
-        holder.submissionCardViewLayout.visibility = View.VISIBLE
-    }
-
-    private fun hideCardView(holder: ViewHolder) {
-        holder.submissionCardViewLayout.visibility = View.INVISIBLE
     }
 
     private fun setUsername(holder: ViewHolder, submission: Submission) {
@@ -130,7 +123,7 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
                     ), 0, length, 0
                 )
             }
-            showCardView(holder)
+            holder.submissionCardViewLayout.visibility = View.VISIBLE
         }
     }
 
@@ -160,7 +153,7 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
                         Bitmap.createBitmap(this)
                     }
                 }
-                async(UI) {
+                launch(UI) {
                     if (holder.oldPosition == -1 || holder.oldPosition == holder.layoutPosition) {
                         holder.thumbnailImageView.setImageBitmap(bitmap)
                         holder.imageCardView.visibility = View.VISIBLE
@@ -173,7 +166,7 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
             }
         } else {
             holder.imageCardView.visibility = View.GONE
-            showCardView(holder)
+            holder.submissionCardViewLayout.visibility = View.VISIBLE
         }
     }
 
