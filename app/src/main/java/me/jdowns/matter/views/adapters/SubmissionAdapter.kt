@@ -4,10 +4,13 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
+import android.text.SpannableString
+import android.util.DisplayMetrics
 import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -15,16 +18,19 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import me.jdowns.matter.Matter
 import me.jdowns.matter.R
+import me.jdowns.matter.helpers.FlowableLeadingMarginSpan2
 import net.dean.jraw.models.Submission
 import java.io.InputStream
 import java.net.URL
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.ceil
 
 class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Adapter<SubmissionAdapter.ViewHolder>() {
     lateinit var listener: SubmissionRecyclerViewListener
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val submissionCardViewLayout = view.findViewById<ViewGroup>(R.id.submission_card_view_layout)!!
         val usernameTextView = view.findViewById<TextView>(R.id.submission_username)!!
         val postTimeTextView = view.findViewById<TextView>(R.id.submission_post_time)!!
         val typeTextView = view.findViewById<TextView>(R.id.submission_type)!!
@@ -57,6 +63,8 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
         ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.view_submission, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        hideCardView(holder)
+
         with(dataSet[position]) {
             setUsername(holder, this)
             setPostTime(holder, this)
@@ -69,9 +77,18 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
             setCommentCount(holder, this)
         }
 
+        /** TODO: Investigate loading before the last element is in view */
         if (position == dataSet.size - 1) {
             listener.atBottom()
         }
+    }
+
+    private fun showCardView(holder: ViewHolder) {
+        holder.submissionCardViewLayout.visibility = View.VISIBLE
+    }
+
+    private fun hideCardView(holder: ViewHolder) {
+        holder.submissionCardViewLayout.visibility = View.INVISIBLE
     }
 
     private fun setUsername(holder: ViewHolder, submission: Submission) {
@@ -95,6 +112,26 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
 
     private fun setTitle(holder: ViewHolder, submission: Submission) {
         holder.titleTextView.text = submission.title
+    }
+
+    private fun adjustTitle(holder: ViewHolder, submission: Submission) {
+        holder.imageCardView.post {
+            val cardViewHeightDp = ceil(holder.imageCardView.height / with(DisplayMetrics()) {
+                (holder.imageCardView.context.getSystemService(android.content.Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getMetrics(
+                    this
+                )
+                this
+            }.density)
+            holder.titleTextView.text = SpannableString(submission.title).apply {
+                setSpan(
+                    FlowableLeadingMarginSpan2(
+                        cardViewHeightDp.toInt() / 20,
+                        holder.imageCardView.width + 10
+                    ), 0, length, 0
+                )
+            }
+            showCardView(holder)
+        }
     }
 
     private fun setSubreddit(holder: ViewHolder, submission: Submission) {
@@ -133,10 +170,15 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
                         }
                     }.await()
                 )
-                holder.imageCardView.visibility = View.VISIBLE
+                holder.imageCardView.apply {
+                    visibility = View.VISIBLE
+
+                }
+                adjustTitle(holder, submission)
             }
         } else {
             holder.imageCardView.visibility = View.GONE
+            showCardView(holder)
         }
     }
 

@@ -14,8 +14,10 @@
     android:padding="8dp">
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/submission_card_view_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="invisible">
 
         <include
             android:id="@+id/view_submission_content"
