@@ -160,7 +160,7 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
     }
 
     companion object {
-        /** TODO: Cached based on memory usage instead of cache size */
+        /** TODO: Cache based on memory usage instead of cache size */
         private val thumbnailCache = LruCache<String, Bitmap>(25)
         private fun addBitmapToCache(key: String, bitmap: Bitmap) {
             if (getBitmapFromCache(key) == null) {
