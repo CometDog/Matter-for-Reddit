@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
@@ -32,11 +33,31 @@ class AllFragment : Fragment() {
             }
         }
 
+        /** TODO: Implement full OAuth */
+        // This is used for general testing
         async {
-            dataSet.addAll(Matter.accountHelper.switchToUserless().subreddit("all").posts().limit(10).build().next())
+            dataSet.addAll(Matter.accountHelper.switchToUserless().subreddit("all").posts().limit(25).build().next())
             launch(UI) {
+                stopInitialLoading()
                 recyclerView.adapter.notifyItemRangeInserted(recyclerView.adapter.itemCount, dataSet.size - 1)
             }
+        }
+    }
+
+    private fun stopInitialLoading() {
+        stopLoading()
+        with(recyclerView) {
+            animate()
+                .withStartAction { visibility = View.VISIBLE }
+                .alpha(1.0F)
+        }
+    }
+
+    private fun stopLoading() {
+        with(view!!.findViewById<ProgressBar>(R.id.fragment_all_progress_bar)) {
+            animate()
+                .alpha(0.0f)
+                .withEndAction { visibility = View.GONE }
         }
     }
 

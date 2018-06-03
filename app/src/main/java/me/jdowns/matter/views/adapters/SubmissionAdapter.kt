@@ -1,8 +1,10 @@
 package me.jdowns.matter.views.adapters
 
-import android.graphics.drawable.Drawable
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
+import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,7 +33,6 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
         val tagTextView = view.findViewById<TextView>(R.id.submission_tag)!!
         val imageCardView = view.findViewById<CardView>(R.id.submission_image_card_view)!!
         val thumbnailImageView = view.findViewById<ImageView>(R.id.submission_thumbnail)!!
-        val actionsLayout = view.findViewById<ViewGroup>(R.id.submission_layout_actions)
         val upvoteImageButton = view.findViewById<ImageButton>(R.id.submission_upvote)!!
         val voteCountTextView = view.findViewById<TextView>(R.id.submission_vote_count)!!
         val downvoteImageButton = view.findViewById<ImageButton>(R.id.submission_downvote)!!
@@ -43,6 +44,11 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
                 downvoteImageButton.visibility = View.VISIBLE
             }
         }
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        thumbnailCache.evictAll()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
@@ -103,16 +109,24 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
                 Regex("^http.?://.*")
             )
         ) {
-            holder.imageCardView.visibility = View.VISIBLE
             async(UI) {
-                holder.thumbnailImageView.setImageDrawable(
+                holder.thumbnailImageView.setImageBitmap(
                     async {
-                        Drawable.createFromStream(
-                            URL(submission.thumbnail).content as InputStream,
-                            "submissionImage"
-                        )
+                        val bitmapFromCache = getBitmapFromCache(submission.thumbnail!!)
+                        if (bitmapFromCache == null) {
+                            val newBitmap = BitmapFactory.decodeStream(
+                                URL(submission.thumbnail).content as InputStream
+                            )
+                            addBitmapToCache(
+                                submission.thumbnail!!, newBitmap
+                            )
+                            newBitmap
+                        } else {
+                            Bitmap.createBitmap(bitmapFromCache)
+                        }
                     }.await()
                 )
+                holder.imageCardView.visibility = View.VISIBLE
             }
         } else {
             holder.imageCardView.visibility = View.GONE
@@ -142,6 +156,20 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
                 this < 31536000 -> Pair(TimeUnit.DAYS.convert(this, TimeUnit.SECONDS), "d")
                 else -> Pair(TimeUnit.DAYS.convert(this, TimeUnit.SECONDS) / 365, "y")
             }
+        }
+    }
+
+    companion object {
+        /** TODO: Cached based on memory usage instead of cache size */
+        private val thumbnailCache = LruCache<String, Bitmap>(25)
+        private fun addBitmapToCache(key: String, bitmap: Bitmap) {
+            if (getBitmapFromCache(key) == null) {
+                thumbnailCache.put(key, bitmap)
+            }
+        }
+
+        private fun getBitmapFromCache(key: String): Bitmap? {
+            return thumbnailCache.get(key) ?: null
         }
     }
 }
