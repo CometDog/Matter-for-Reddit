@@ -6,13 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.design.widget.NavigationView
+    <me.jdowns.matter.views.widgets.ScrollableNavigationView
         android:id="@+id/subreddits_navigation_bar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?android:attr/windowBackground"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/fragment_submission_container">
+        app:layout_constraintTop_toTopOf="parent">
 
         <android.support.v7.widget.RecyclerView
             android:orientation="horizontal"
@@ -20,13 +19,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-    </android.support.design.widget.NavigationView>
+    </me.jdowns.matter.views.widgets.ScrollableNavigationView>
 
     <FrameLayout
         android:id="@+id/fragment_submission_container"
         tools:layout="@layout/view_submission"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/subreddits_navigation_bar" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

@@ -25,22 +25,19 @@ class SubredditAdapter(private val dataSet: List<Subreddit>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         with(dataSet[position]) {
-            setSubredditTitle(holder, this)
-            setSubredditClickListener(holder, this)
+            setSubredditView(holder, this)
         }
 
         super.onBindViewHolder(holder, position)
     }
 
-    private fun setSubredditTitle(holder: ViewHolder, subreddit: Subreddit) {
-        holder.subredditTitle.text =
-                holder.subredditTitle.resources.getString(R.string.subreddit_qualifier, subreddit.name)
-    }
-
-    private fun setSubredditClickListener(holder: ViewHolder, subreddit: Subreddit) {
-        holder.subredditTitle.setOnClickListener({
-            (listener as SubredditAdapterListener).subredditClicked(subreddit.name)
-        })
+    private fun setSubredditView(holder: ViewHolder, subreddit: Subreddit) {
+        holder.subredditTitle.apply {
+            text = subreddit.name.toUpperCase()
+            setOnClickListener({
+                (listener as SubredditAdapterListener).subredditClicked(subreddit.name)
+            })
+        }
     }
 
     interface SubredditAdapterListener : BaseRecyclerView.BaseAdapterListener {

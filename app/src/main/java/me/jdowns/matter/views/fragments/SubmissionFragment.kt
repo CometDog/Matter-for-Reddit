@@ -12,10 +12,12 @@ import android.widget.TextView
 import me.jdowns.matter.Matter
 import me.jdowns.matter.R
 import me.jdowns.matter.views.adapters.SubmissionAdapter
+import me.jdowns.matter.views.widgets.BaseRecyclerView
 import net.dean.jraw.models.Submission
 import net.dean.jraw.pagination.Paginator
 
 class SubmissionFragment : BaseFragmentWithRecyclerView<Submission>(), SwipeRefreshLayout.OnRefreshListener {
+    var listener: SubmissionFragmentListener? = null
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     override val paginator: Paginator<Submission> = if (subreddit.isEmpty()) {
         Matter.accountHelper.reddit.frontPage().limit(25).build()
@@ -39,6 +41,16 @@ class SubmissionFragment : BaseFragmentWithRecyclerView<Submission>(), SwipeRefr
             layoutManager = LinearLayoutManager(context).apply {
                 orientation = LinearLayout.VERTICAL
             }
+            addOnScrollListener(object : BaseRecyclerView.BaseVerticalScrollListener() {
+                override fun scrollingUp() {
+                    listener?.scrollingUp()
+                }
+
+                override fun scrollingDown() {
+                    listener?.scrollingDown()
+                }
+
+            })
         }
         swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout_view_submission).apply {
             setOnRefreshListener(this@SubmissionFragment)
@@ -54,6 +66,7 @@ class SubmissionFragment : BaseFragmentWithRecyclerView<Submission>(), SwipeRefr
             dataSet.clear()
             recyclerView.adapter.notifyDataSetChanged()
         }
+        hasMorePages = true
         paginator.restart()
         tryGetMore()
     }
@@ -69,6 +82,11 @@ class SubmissionFragment : BaseFragmentWithRecyclerView<Submission>(), SwipeRefr
                 .withStartAction { visibility = View.VISIBLE }
                 .alpha(1.0F)
         }
+    }
+
+    interface SubmissionFragmentListener {
+        fun scrollingUp()
+        fun scrollingDown()
     }
 
     companion object {

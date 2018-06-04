@@ -20,4 +20,27 @@ abstract class BaseRecyclerView(context: Context) : RecyclerView(context) {
     interface BaseAdapterListener {
         fun atEnd()
     }
+
+    abstract class BaseVerticalScrollListener : OnScrollListener() {
+        var distance = 0
+        private val minimum = 3
+        override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            when {
+                distance > minimum -> {
+                    scrollingDown()
+                    distance = 0
+                }
+                distance < -minimum -> {
+                    scrollingUp()
+                    distance = 0
+                }
+                else -> distance += dy
+            }
+        }
+
+        abstract fun scrollingDown()
+        abstract fun scrollingUp()
+    }
 }

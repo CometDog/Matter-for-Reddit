@@ -16,7 +16,7 @@ abstract class BaseFragmentWithRecyclerView<T : UniquelyIdentifiable> : android.
     protected lateinit var recyclerView: RecyclerView
     protected val dataSet: MutableList<T> = mutableListOf()
     private var lastDataSet: MutableList<T> = mutableListOf()
-    private var hasMorePages: Boolean = true
+    protected var hasMorePages: Boolean = true
     protected lateinit var job: Deferred<Listing<T>>
 
     override fun atEnd() {
@@ -31,6 +31,7 @@ abstract class BaseFragmentWithRecyclerView<T : UniquelyIdentifiable> : android.
                 val newDataSet = paginator!!.next()
                 if (lastDataSet == newDataSet) {
                     hasMorePages = false
+                    lastDataSet.clear()
                     logNoMorePage()
                 } else {
                     lastDataSet = newDataSet
