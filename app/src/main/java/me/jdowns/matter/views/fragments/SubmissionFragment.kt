@@ -34,14 +34,14 @@ class SubmissionFragment : BaseFragmentWithRecyclerView<Submission>(), SwipeRefr
         activity?.findViewById<TextView>(R.id.action_bar_title)?.text =
                 getString(if (subreddit.isEmpty()) R.string.front_page else R.string.subreddit_qualifier, subreddit)
 
-        recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_submission).apply {
-            adapter = SubmissionAdapter(dataSet).apply {
-                listener = this@SubmissionFragment
+        recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_submission).also {
+            it.adapter = SubmissionAdapter(dataSet).also {
+                it.listener = this
             }
-            layoutManager = LinearLayoutManager(context).apply {
+            it.layoutManager = LinearLayoutManager(context).apply {
                 orientation = LinearLayout.VERTICAL
             }
-            addOnScrollListener(object : BaseRecyclerView.BaseVerticalScrollListener() {
+            it.addOnScrollListener(object : BaseRecyclerView.BaseVerticalScrollListener() {
                 override fun scrollingUp() {
                     listener?.scrollingUp()
                 }
@@ -52,10 +52,10 @@ class SubmissionFragment : BaseFragmentWithRecyclerView<Submission>(), SwipeRefr
 
             })
         }
-        swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout_view_submission).apply {
-            setOnRefreshListener(this@SubmissionFragment)
-            post {
-                isRefreshing = true
+        swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout_view_submission).also {
+            it.setOnRefreshListener(this)
+            it.post {
+                it.isRefreshing = true
                 onRefresh()
             }
         }
@@ -71,9 +71,7 @@ class SubmissionFragment : BaseFragmentWithRecyclerView<Submission>(), SwipeRefr
         tryGetMore()
     }
 
-    override fun updateView() {
-        stopLoading()
-    }
+    override fun updateView() = stopLoading()
 
     private fun stopLoading() {
         swipeRefreshLayout.isRefreshing = false

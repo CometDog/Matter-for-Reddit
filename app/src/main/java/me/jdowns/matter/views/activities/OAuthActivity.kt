@@ -28,8 +28,8 @@ class OAuthActivity : AppCompatActivity() {
     private fun displayOAuthPage() {
         val oAuthHelper = Matter.accountHelper.switchToNewUser()
 
-        findViewById<WebView>(R.id.oauth_webview).apply {
-            webViewClient = OAuthWebViewClient(oAuthHelper, this@OAuthActivity)
+        findViewById<WebView>(R.id.oauth_webview)!!.also {
+            it.webViewClient = OAuthWebViewClient(oAuthHelper, this)
             if (BuildConfig.DEBUG) {
                 WebView.setWebContentsDebuggingEnabled(true)
             }

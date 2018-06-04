@@ -22,7 +22,7 @@ abstract class BaseRecyclerView(context: Context) : RecyclerView(context) {
     }
 
     abstract class BaseVerticalScrollListener : OnScrollListener() {
-        var distance = 0
+        private var distance = 0
         private val minimum = 3
         override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)

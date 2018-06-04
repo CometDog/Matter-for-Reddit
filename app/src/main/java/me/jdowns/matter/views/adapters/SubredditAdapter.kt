@@ -32,7 +32,7 @@ class SubredditAdapter(private val dataSet: List<Subreddit>) :
     }
 
     private fun setSubredditView(holder: ViewHolder, subreddit: Subreddit) {
-        holder.subredditTitle.apply {
+        with(holder.subredditTitle) {
             text = subreddit.name.toUpperCase()
             setOnClickListener({
                 (listener as SubredditAdapterListener).subredditClicked(subreddit.name)

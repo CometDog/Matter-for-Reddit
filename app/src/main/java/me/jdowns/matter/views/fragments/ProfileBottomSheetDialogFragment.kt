@@ -2,33 +2,32 @@ package me.jdowns.matter.views.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.BottomSheetDialogFragment
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import me.jdowns.matter.Matter
 import me.jdowns.matter.R
 import me.jdowns.matter.views.activities.OAuthActivity
-import me.jdowns.matter.views.widgets.BaseBottomSheetDialog
-import me.jdowns.matter.views.widgets.BaseBottomSheetDialogFragment
 
-class ProfileBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
-    override fun onCreateDialog(savedInstanceState: Bundle?): BaseBottomSheetDialog {
-        return super.onCreateDialog(savedInstanceState).apply {
-            setContentView(R.layout.dialog_fragment_profile)
-        }
-    }
+class ProfileBottomSheetDialogFragment : BottomSheetDialogFragment() {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.dialog_fragment_profile, container, false)
 
-    override fun onDialogViewCreated(view: View, savedInstanceState: Bundle?) {
-        with(view.findViewById<TextView>(R.id.profile_username)) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        view.findViewById<TextView>(R.id.profile_username)!!.let {
             if (Matter.isRealUser()) {
-                text = Matter.accountHelper.reddit.me().username
+                it.text = Matter.accountHelper.reddit.me().username
             } else {
-                text = getString(R.string.log_in)
-                setOnClickListener({
+                it.text = getString(R.string.log_in)
+                it.setOnClickListener({
                     startActivityForResult(
                         Intent(activity, OAuthActivity::class.java),
                         OAuthActivity.OAUTH_REQUEST_CODE
                     )
-                    this@ProfileBottomSheetDialogFragment.dismiss()
+                    dismiss()
                 })
             }
         }

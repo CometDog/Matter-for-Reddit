@@ -88,16 +88,18 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
     }
 
     private fun setPostTime(holder: ViewHolder, submission: Submission) {
-        with(getTimeDiff(submission.created)) {
-            holder.postTimeTextView.text = first.toString().plus(second)
-        }
+        holder.postTimeTextView.text = getTimeDiffString(submission.created)
     }
 
     private fun setType(holder: ViewHolder, submission: Submission) {
         if (!submission.isSelfPost) {
-            holder.typeTextView.visibility = View.VISIBLE
-            holder.typeSeparator.visibility = View.VISIBLE
-            holder.typeTextView.text = submission.postHint
+            with(holder) {
+                typeSeparator.visibility = View.VISIBLE
+                with(typeTextView) {
+                    visibility = View.VISIBLE
+                    text = submission.postHint
+                }
+            }
         }
     }
 
@@ -106,22 +108,23 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
     }
 
     private fun adjustTitle(holder: ViewHolder, submission: Submission) {
-        holder.imageCardView.post {
-            val cardViewHeightDp = ceil(holder.imageCardView.height / with(DisplayMetrics()) {
-                (holder.imageCardView.context.getSystemService(android.content.Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getMetrics(
-                    this
-                )
-                this
-            }.density)
-            holder.titleTextView.text = SpannableString(submission.title).apply {
-                setSpan(
-                    FlowableLeadingMarginSpan2(
-                        cardViewHeightDp.toInt() / 20,
-                        holder.imageCardView.width + 10
-                    ), 0, length, 0
-                )
+        with(holder) {
+            imageCardView.post {
+                val cardViewHeightDp = ceil(imageCardView.height / DisplayMetrics().also {
+                    (imageCardView.context.getSystemService(android.content.Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getMetrics(
+                        it
+                    )
+                }.density)
+                titleTextView.text = SpannableString(submission.title).also {
+                    it.setSpan(
+                        FlowableLeadingMarginSpan2(
+                            cardViewHeightDp.toInt() / 20,
+                            imageCardView.width + 10
+                        ), 0, it.length, 0
+                    )
+                }
+                submissionCardViewLayout.visibility = View.VISIBLE
             }
-            holder.submissionCardViewLayout.visibility = View.VISIBLE
         }
     }
 
@@ -132,9 +135,13 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
 
     private fun setFlair(holder: ViewHolder, submission: Submission) {
         if (!submission.linkFlairCssClass.isNullOrBlank()) {
-            holder.tagTextView.visibility = View.VISIBLE
-            holder.subredditSeparator.visibility = View.VISIBLE
-            holder.tagTextView.text = submission.linkFlairCssClass
+            with(holder) {
+                subredditSeparator.visibility = View.VISIBLE
+                with(tagTextView) {
+                    visibility = View.VISIBLE
+                    text = submission.linkFlairCssClass
+                }
+            }
         }
     }
 
@@ -144,35 +151,31 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
             )
         ) {
             async {
-                val bitmap = with(thumbnailCache.get(submission.uniqueId)) {
-                    if (this == null) {
-                        BitmapFactory.decodeStream(URL(submission.thumbnail).content as InputStream)
-                    } else {
-                        Bitmap.createBitmap(this)
-                    }
-                }
+                val bitmap = thumbnailCache.get(submission.uniqueId)?.run {
+                    Bitmap.createBitmap(this)
+                } ?: BitmapFactory.decodeStream(URL(submission.thumbnail).content as InputStream)
                 launch(UI) {
-                    if (holder.oldPosition == -1 || holder.oldPosition == holder.layoutPosition) {
-                        holder.thumbnailImageView.setImageBitmap(bitmap)
-                        holder.imageCardView.visibility = View.VISIBLE
-                        adjustTitle(holder, submission)
-                        thumbnailCache.put(
-                            submission.uniqueId, bitmap
-                        )
+                    with(holder) {
+                        if (oldPosition == -1 || oldPosition == layoutPosition) {
+                            thumbnailImageView.setImageBitmap(bitmap)
+                            imageCardView.visibility = View.VISIBLE
+                            adjustTitle(this, submission)
+                            thumbnailCache.put(submission.uniqueId, bitmap)
+                        }
                     }
                 }
             }
         } else {
-            holder.imageCardView.visibility = View.GONE
-            holder.submissionCardViewLayout.visibility = View.VISIBLE
+            with(holder) {
+                imageCardView.visibility = View.GONE
+                submissionCardViewLayout.visibility = View.VISIBLE
+            }
         }
     }
 
     private fun setScore(holder: ViewHolder, submission: Submission) {
-        if (submission.isScoreHidden) {
-            holder.voteCountTextView.text = "?"
-        } else {
-            holder.voteCountTextView.text = submission.score.toString()
+        with(submission) {
+            holder.voteCountTextView.text = if (isScoreHidden) "?" else score.toString()
         }
     }
 
@@ -180,14 +183,16 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
         holder.commentCountTextView.text = submission.commentCount.toString()
     }
 
-    private fun getTimeDiff(submissionDate: Date): Pair<Long, String> {
-        with((Date().time - submissionDate.time) / 1000L) {
-            return when {
-                this < 60 -> Pair(TimeUnit.SECONDS.convert(this, TimeUnit.SECONDS), "s")
-                this < 3600 -> Pair(TimeUnit.MINUTES.convert(this, TimeUnit.SECONDS), "m")
-                this < 86400 -> Pair(TimeUnit.HOURS.convert(this, TimeUnit.SECONDS), "h")
-                this < 31536000 -> Pair(TimeUnit.DAYS.convert(this, TimeUnit.SECONDS), "d")
-                else -> Pair(TimeUnit.DAYS.convert(this, TimeUnit.SECONDS) / 365, "y")
+    private fun getTimeDiffString(submissionDate: Date): String {
+        return run {
+            val timeDiffSeconds = (Date().time - submissionDate.time) / 1000L
+            val timeUnit = TimeUnit.SECONDS
+            when {
+                timeDiffSeconds < 60 -> timeDiffSeconds.toString().plus("s")
+                timeDiffSeconds < 3600 -> TimeUnit.MINUTES.convert(timeDiffSeconds, timeUnit).toString().plus("m")
+                timeDiffSeconds < 86400 -> TimeUnit.HOURS.convert(timeDiffSeconds, timeUnit).toString().plus("h")
+                timeDiffSeconds < 31536000 -> TimeUnit.DAYS.convert(timeDiffSeconds, timeUnit).toString().plus("d")
+                else -> (TimeUnit.DAYS.convert(timeDiffSeconds, timeUnit) / 365).toString().plus("y")
             }
         }
     }

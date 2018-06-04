@@ -27,38 +27,30 @@ class SubredditFragment : BaseFragmentWithRecyclerView<Subreddit>(), SubredditAd
         super.onViewCreated(view, savedInstanceState)
 
         navigationView = view.findViewById(R.id.subreddits_navigation_bar)
-        recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_subreddit_names).apply {
-            adapter = SubredditAdapter(dataSet).apply {
-                listener = this@SubredditFragment
+        recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_subreddit_names).also {
+            it.adapter = SubredditAdapter(dataSet).also {
+                it.listener = this
             }
-            layoutManager = LinearLayoutManager(context).apply {
+            it.layoutManager = LinearLayoutManager(context).apply {
                 orientation = LinearLayout.HORIZONTAL
             }
         }
         tryGetMore()
     }
 
-    override fun updateView() {
-        addSubmissionFragment(dataSet[0].title)
-    }
+    override fun updateView() = addSubmissionFragment(dataSet[0].title)
 
-    override fun subredditClicked(subredditTitle: String) {
-        addSubmissionFragment(subredditTitle)
-    }
+    override fun subredditClicked(subredditTitle: String) = addSubmissionFragment(subredditTitle)
 
-    override fun scrollingDown() {
-        navigationView.tryStartHideAnimation()
-    }
+    override fun scrollingDown() = navigationView.tryStartHideAnimation()
 
-    override fun scrollingUp() {
-        navigationView.tryStartShowAnimation()
-    }
+    override fun scrollingUp() = navigationView.tryStartShowAnimation()
 
     private fun addSubmissionFragment(subredditName: String) {
         childFragmentManager.beginTransaction().replace(
             R.id.fragment_submission_container,
-            SubmissionFragment.newInstance(subredditName).apply {
-                listener = this@SubredditFragment
+            SubmissionFragment.newInstance(subredditName).also {
+                it.listener = this
             },
             SubmissionFragment.FRAGMENT_TAG
         ).commit()

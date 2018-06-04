@@ -19,9 +19,7 @@ abstract class BaseFragmentWithRecyclerView<T : UniquelyIdentifiable> : android.
     protected var hasMorePages: Boolean = true
     protected lateinit var job: Deferred<Listing<T>>
 
-    override fun atEnd() {
-        tryGetMore()
-    }
+    override fun atEnd() = tryGetMore()
 
     protected abstract fun updateView()
 
