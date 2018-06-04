@@ -15,7 +15,7 @@
             android:value="PiwwowPants" />
         <meta-data
             android:name="net.dean.jraw.android.CLIENT_ID"
-            android:value="6kt2pSwz_wm1Uw" />
+            android:value="t35jvfBbHfiDSg" />
         <meta-data
             android:name="net.dean.jraw.android.REDIRECT_URL"
             android:value="https://github.com/Piwwowpants" />
@@ -26,6 +26,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".views.activities.OAuthActivity"
+            android:alwaysRetainTaskState="true" />
     </application>
 
 </manifest>

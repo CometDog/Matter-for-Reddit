@@ -2,10 +2,22 @@
   <dictionary name="matter">
     <words>
       <w>flowable</w>
+      <w>livemanage</w>
+      <w>modconfig</w>
+      <w>modcontributors</w>
+      <w>modmail</w>
+      <w>modothers</w>
+      <w>modposts</w>
+      <w>modself</w>
+      <w>mysubreddits</w>
       <w>paginator</w>
       <w>piwwow</w>
+      <w>privatemessages</w>
       <w>subreddit</w>
       <w>subreddits</w>
+      <w>userentity</w>
+      <w>userless</w>
+      <w>webview</w>
       <w>whatshot</w>
     </words>
   </dictionary>

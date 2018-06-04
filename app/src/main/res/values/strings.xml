@@ -12,6 +12,8 @@
     <string name="settings">Settings</string>
     <string name="username">Username</string>
     <string name="log_in">Log In</string>
+    <string name="authentication_issue">There was an issue authenticating. Check your Reddit account for possible problems and try again.</string>
+    <string name="front_page">Front Page</string>
 
     <!-- Reddit templates -->
     <string name="subreddit_qualifier">/r/%s</string>

@@ -10,6 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
@@ -26,6 +28,7 @@ class SubmissionFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener,
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private val dataSet: MutableList<Submission> = mutableListOf()
     private lateinit var subreddit: String
+    private var getNextPageJob: Deferred<Job>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_submission, container, false)
@@ -36,7 +39,7 @@ class SubmissionFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener,
 
         subreddit = arguments?.getString(SUBREDDIT_KEY) ?: "all"
         activity?.findViewById<TextView>(R.id.action_bar_title)?.text =
-                getString(R.string.subreddit_qualifier, subreddit)
+                getString(if (subreddit.isEmpty()) R.string.front_page else R.string.subreddit_qualifier, subreddit)
 
         recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_submission).apply {
             adapter = SubmissionAdapter(dataSet).apply {
@@ -76,20 +79,38 @@ class SubmissionFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     private fun getNextPage() {
-        async {
-            if (paginator == null) {
-                /** TODO: Implement full OAuth */
-                // This is used for general testing
-                paginator = Matter.accountHelper.switchToUserless().subreddit(subreddit).posts().limit(25).build()
-            }
-            val newDataSet = paginator!!.next()
-            dataSet.addAll(newDataSet)
-            launch(UI) {
-                recyclerView.adapter.notifyItemRangeInserted(recyclerView.adapter.itemCount, newDataSet.size - 1)
-                stopLoading()
+        if (getNextPageJob == null) {
+            getNextPageJob = async {
+                if (paginator == null) {
+                    paginator = if (subreddit.isEmpty()) {
+                        Matter.accountHelper.reddit.frontPage().limit(25).build()
+                    } else {
+                        Matter.accountHelper.reddit.subreddit(subreddit).posts().limit(25).build()
+                    }
+                }
+                val newDataSet = paginator!!.next()
+                dataSet.addAll(newDataSet)
+                launch(UI) {
+                    recyclerView.adapter.notifyItemRangeInserted(recyclerView.adapter.itemCount, newDataSet.size - 1)
+                    stopLoading()
+                }
             }
         }
+        getNextPageJob!!.start()
+    }
 
+    override fun onStop() {
+        super.onStop()
+        if (getNextPageJob != null) {
+            getNextPageJob!!.cancel()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (getNextPageJob != null) {
+            getNextPageJob!!.start()
+        }
     }
 
     private fun stopLoading() {
@@ -104,9 +125,9 @@ class SubmissionFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener,
     companion object {
         const val FRAGMENT_TAG = "submissionFragmentTag"
         private const val SUBREDDIT_KEY = "subredditKey"
-        fun newInstance(subreddit: String): SubmissionFragment = SubmissionFragment().apply {
+        fun newInstance(subreddit: String?): SubmissionFragment = SubmissionFragment().apply {
             arguments = Bundle().apply {
-                putString(SUBREDDIT_KEY, subreddit)
+                putString(SUBREDDIT_KEY, subreddit ?: "")
             }
         }
     }
