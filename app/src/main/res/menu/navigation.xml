@@ -3,9 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_all"
+        android:id="@+id/navigation_front_page"
         android:icon="@drawable/ic_whatshot_24dp"
-        android:title="@string/all" />
+        android:title="@string/front_page" />
 
     <item
         android:id="@+id/navigation_subreddits"

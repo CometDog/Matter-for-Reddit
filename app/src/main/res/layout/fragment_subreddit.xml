@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/subreddits_navigation_bar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?android:attr/windowBackground"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/fragment_submission_container">
+
+        <android.support.v7.widget.RecyclerView
+            android:orientation="horizontal"
+            android:id="@+id/recycler_view_subreddit_names"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </android.support.design.widget.NavigationView>
+
+    <FrameLayout
+        android:id="@+id/fragment_submission_container"
+        tools:layout="@layout/view_submission"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/subreddits_navigation_bar" />
+
+</android.support.constraint.ConstraintLayout>

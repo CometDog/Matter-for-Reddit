@@ -20,6 +20,7 @@ import me.jdowns.matter.Matter
 import me.jdowns.matter.R
 import me.jdowns.matter.styles.FlowableLeadingMarginSpan2
 import me.jdowns.matter.utils.BitmapLruCache
+import me.jdowns.matter.views.widgets.BaseRecyclerView
 import net.dean.jraw.models.Submission
 import java.io.InputStream
 import java.net.URL
@@ -27,8 +28,8 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
 
-class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Adapter<SubmissionAdapter.ViewHolder>() {
-    lateinit var listener: SubmissionRecyclerViewListener
+class SubmissionAdapter(private val dataSet: List<Submission>) :
+    BaseRecyclerView.BaseAdapter<SubmissionAdapter.ViewHolder, Submission>(dataSet) {
     private val thumbnailCache = BitmapLruCache()
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val submissionCardViewLayout = view.findViewById<ViewGroup>(R.id.submission_card_view_layout)!!
@@ -78,10 +79,7 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
             setCommentCount(holder, this)
         }
 
-        /** TODO: Investigate loading before the last element is in view */
-        if (position == dataSet.size - 1) {
-            listener.atBottom()
-        }
+        super.onBindViewHolder(holder, position)
     }
 
     private fun setUsername(holder: ViewHolder, submission: Submission) {
@@ -182,8 +180,6 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
         holder.commentCountTextView.text = submission.commentCount.toString()
     }
 
-    override fun getItemCount(): Int = dataSet.size
-
     private fun getTimeDiff(submissionDate: Date): Pair<Long, String> {
         with((Date().time - submissionDate.time) / 1000L) {
             return when {
@@ -194,9 +190,5 @@ class SubmissionAdapter(private val dataSet: List<Submission>) : RecyclerView.Ad
                 else -> Pair(TimeUnit.DAYS.convert(this, TimeUnit.SECONDS) / 365, "y")
             }
         }
-    }
-
-    interface SubmissionRecyclerViewListener {
-        fun atBottom()
     }
 }

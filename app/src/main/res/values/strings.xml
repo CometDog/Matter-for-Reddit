@@ -28,6 +28,7 @@
     <string name="placeholder_submission_tag">Developer</string>
     <string name="placeholder_submission_vote_count">593</string>
     <string name="placeholder_submission_comment_count">31</string>
+    <string name="placeholder_subreddit_no_qualifier">lifeisstrange</string>
 
     <!-- Other -->
     <string name="separator">Separator</string>

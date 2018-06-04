@@ -2,7 +2,9 @@ package me.jdowns.matter.views.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
@@ -13,8 +15,10 @@ import me.jdowns.matter.Matter
 import me.jdowns.matter.R
 import me.jdowns.matter.views.fragments.ProfileBottomSheetDialogFragment
 import me.jdowns.matter.views.fragments.SubmissionFragment
+import me.jdowns.matter.views.fragments.SubredditFragment
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var bottomNavigationView: BottomNavigationView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -26,6 +30,12 @@ class MainActivity : AppCompatActivity() {
             )
         }
         setUpUser()
+        bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_bar).apply {
+            setOnNavigationItemSelectedListener {
+                addFragment(it)
+                true
+            }
+        }
     }
 
     private fun setUpUser() {
@@ -42,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                         setUpUserless()
                     }
                 }
-                addInitialSubmissionView()
+                addFragment()
             }
         }
     }
@@ -57,13 +67,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun addFragment(menuItem: MenuItem? = null) {
+        with(bottomNavigationView) {
+            if (visibility == View.GONE) {
+                addInitialSubmissionView()
+            } else {
+                if (menuItem?.itemId != selectedItemId) {
+                    when (menuItem?.itemId ?: selectedItemId) {
+                        R.id.navigation_front_page -> addInitialSubmissionView()
+                        R.id.navigation_subreddits -> addSubredditsView()
+                    }
+                }
+            }
+        }
+    }
+
     private fun addInitialSubmissionView() {
         supportFragmentManager
             .beginTransaction()
             .replace(
                 R.id.fragment_main,
-                SubmissionFragment.newInstance(if (Matter.isRealUser()) null else "all"),
+                SubmissionFragment.newInstance(if (Matter.isRealUser()) null else getString(R.string.all)),
                 SubmissionFragment.FRAGMENT_TAG
+            )
+            .commit()
+    }
+
+    private fun addSubredditsView() {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(
+                R.id.fragment_main,
+                SubredditFragment(),
+                SubredditFragment.FRAGMENT_TAG
             )
             .commit()
     }
