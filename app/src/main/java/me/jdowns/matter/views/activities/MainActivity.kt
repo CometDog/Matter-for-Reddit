@@ -48,8 +48,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpUserless() {
-        Matter.accountHelper.switchToUserless()
-        findViewById<ViewGroup>(R.id.bottom_navigation_bar).visibility = View.GONE
+        try {
+            Matter.accountHelper.switchToUserless()
+        } catch (e: Throwable) {
+            Matter.accountHelper.switchToNewUser()
+        } finally {
+            findViewById<ViewGroup>(R.id.bottom_navigation_bar).visibility = View.GONE
+        }
     }
 
     private fun addInitialSubmissionView() {

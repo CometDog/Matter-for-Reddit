@@ -10,8 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
@@ -28,7 +26,6 @@ class SubmissionFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener,
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private val dataSet: MutableList<Submission> = mutableListOf()
     private lateinit var subreddit: String
-    private var getNextPageJob: Deferred<Job>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_submission, container, false)
@@ -79,37 +76,20 @@ class SubmissionFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     private fun getNextPage() {
-        if (getNextPageJob == null) {
-            getNextPageJob = async {
-                if (paginator == null) {
-                    paginator = if (subreddit.isEmpty()) {
-                        Matter.accountHelper.reddit.frontPage().limit(25).build()
-                    } else {
-                        Matter.accountHelper.reddit.subreddit(subreddit).posts().limit(25).build()
-                    }
-                }
-                val newDataSet = paginator!!.next()
-                dataSet.addAll(newDataSet)
-                launch(UI) {
-                    recyclerView.adapter.notifyItemRangeInserted(recyclerView.adapter.itemCount, newDataSet.size - 1)
-                    stopLoading()
+        async {
+            if (paginator == null) {
+                paginator = if (subreddit.isEmpty()) {
+                    Matter.accountHelper.reddit.frontPage().limit(25).build()
+                } else {
+                    Matter.accountHelper.reddit.subreddit(subreddit).posts().limit(25).build()
                 }
             }
-        }
-        getNextPageJob!!.start()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        if (getNextPageJob != null) {
-            getNextPageJob!!.cancel()
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (getNextPageJob != null) {
-            getNextPageJob!!.start()
+            val newDataSet = paginator!!.next()
+            dataSet.addAll(newDataSet)
+            launch(UI) {
+                recyclerView.adapter.notifyItemRangeInserted(recyclerView.adapter.itemCount, newDataSet.size - 1)
+                stopLoading()
+            }
         }
     }
 
