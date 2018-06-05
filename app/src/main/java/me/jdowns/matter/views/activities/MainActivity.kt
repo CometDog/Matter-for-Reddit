@@ -15,14 +15,20 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import me.jdowns.matter.Matter
 import me.jdowns.matter.R
+import me.jdowns.matter.room.user.UserDao
 import me.jdowns.matter.views.fragments.ProfileBottomSheetDialogFragment
 import me.jdowns.matter.views.fragments.SubmissionFragment
 import me.jdowns.matter.views.fragments.SubredditFragment
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
+    @Inject
+    lateinit var userDao: UserDao
     private lateinit var bottomNavigationView: BottomNavigationView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Matter.dependencyGraph.inject(this)
+
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
 
@@ -58,7 +64,7 @@ class MainActivity : AppCompatActivity() {
     @WorkerThread
     private fun setUpUser() {
         try {
-            Matter.accountHelper.switchToUser(Matter.provideDatabase().userDao().getLoggedIn()?.username!!)
+            Matter.accountHelper.switchToUser(userDao.getLoggedIn()?.username!!)
         } catch (e: Exception) {
             Matter.accountHelper.switchToUserless()
         }
@@ -109,5 +115,11 @@ class MainActivity : AppCompatActivity() {
             /** TODO: Handle other results from OAuthActivity */
             Toast.makeText(applicationContext, R.string.authentication_issue, Toast.LENGTH_LONG).show()
         }
+    }
+
+    override fun recreate() {
+        supportFragmentManager.beginTransaction()
+            .remove(supportFragmentManager.findFragmentByTag(SubmissionFragment.FRAGMENT_TAG)).commitNow()
+        super.recreate()
     }
 }

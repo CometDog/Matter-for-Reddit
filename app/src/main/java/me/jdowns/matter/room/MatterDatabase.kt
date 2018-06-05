@@ -9,7 +9,3 @@ import me.jdowns.matter.room.user.UserEntity
 abstract class MatterDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
 }
-
-interface MatterDatabaseProvider {
-    fun provideDatabase(): MatterDatabase
-}

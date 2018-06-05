@@ -12,8 +12,18 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import me.jdowns.matter.Matter
 import me.jdowns.matter.R
+import me.jdowns.matter.room.user.UserDao
+import javax.inject.Inject
 
 class ProfileBottomSheetDialogFragment : BottomSheetDialogFragment() {
+    @Inject
+    lateinit var userDao: UserDao
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Matter.dependencyGraph.inject(this)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.dialog_fragment_profile, container, false)
 
@@ -57,7 +67,7 @@ class ProfileBottomSheetDialogFragment : BottomSheetDialogFragment() {
     @UiThread
     private suspend fun logOut() {
         launch {
-            Matter.provideDatabase().userDao().setLoggedOut(Matter.accountHelper.reddit.me().username)
+            userDao.setLoggedOut(Matter.accountHelper.reddit.me().username)
         }.join()
         dismiss()
         activity!!.recreate()

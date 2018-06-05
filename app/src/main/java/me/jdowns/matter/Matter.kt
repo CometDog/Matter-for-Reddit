@@ -1,10 +1,10 @@
 package me.jdowns.matter
 
 import android.app.Application
-import android.arch.persistence.room.Room
 import android.util.Log
-import me.jdowns.matter.room.MatterDatabase
-import me.jdowns.matter.room.MatterDatabaseProvider
+import me.jdowns.matter.dagger.modules.ApplicationComponent
+import me.jdowns.matter.dagger.modules.DaggerApplicationComponent
+import me.jdowns.matter.dagger.modules.RoomModule
 import net.dean.jraw.RedditClient
 import net.dean.jraw.android.AndroidHelper
 import net.dean.jraw.android.ManifestAppInfoProvider
@@ -16,13 +16,11 @@ import net.dean.jraw.oauth.AuthMethod
 import java.util.*
 
 class Matter : Application() {
-
-    init {
-        application = this
-    }
-
     override fun onCreate() {
         super.onCreate()
+        dependencyGraph = DaggerApplicationComponent.builder().roomModule(RoomModule(this)).build().also {
+            it.inject(this)
+        }
 
         tokenStore = SharedPreferencesTokenStore(applicationContext).apply {
             load()
@@ -41,27 +39,13 @@ class Matter : Application() {
                     }
     }
 
-    companion object : MatterDatabaseProvider {
-        var application: Matter? = null
+    companion object {
+        @JvmStatic
+        lateinit var dependencyGraph: ApplicationComponent
         lateinit var accountHelper: AccountHelper
         lateinit var tokenStore: SharedPreferencesTokenStore
-        private var database: MatterDatabase? = null
 
         fun isRealUser(): Boolean =
             accountHelper.isAuthenticated() && accountHelper.reddit.authMethod != AuthMethod.USERLESS_APP
-
-        @Synchronized
-        override fun provideDatabase(): MatterDatabase {
-            return database ?: kotlin.run {
-                database = Room.databaseBuilder(
-                    application!!.applicationContext,
-                    MatterDatabase::class.java,
-                    "MatterDatabase"
-                )
-                    .fallbackToDestructiveMigration()
-                    .build()
-                return database!!
-            }
-        }
     }
 }

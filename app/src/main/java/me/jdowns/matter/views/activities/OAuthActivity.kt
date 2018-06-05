@@ -13,17 +13,22 @@ import kotlinx.coroutines.experimental.launch
 import me.jdowns.matter.BuildConfig
 import me.jdowns.matter.Matter
 import me.jdowns.matter.R
+import me.jdowns.matter.room.user.UserDao
 import me.jdowns.matter.room.user.UserEntity
 import net.dean.jraw.oauth.StatefulAuthHelper
+import javax.inject.Inject
 
 class OAuthActivity : AppCompatActivity() {
+    @Inject
+    lateinit var userDao: UserDao
     private val scopes =
         "edit, history, identity, livemanage, modconfig, modcontributors, modmail, modothers, modposts, modself, mysubreddits, privatemessages, read, report, save, submit, subscribe, vote"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_oauth)
+        Matter.dependencyGraph.inject(this)
 
+        setContentView(R.layout.activity_oauth)
         displayOAuthPage()
     }
 
@@ -31,14 +36,18 @@ class OAuthActivity : AppCompatActivity() {
         val oAuthHelper = Matter.accountHelper.switchToNewUser()
 
         findViewById<WebView>(R.id.oauth_webview)!!.also {
-            it.webViewClient = OAuthWebViewClient(oAuthHelper, this)
+            it.webViewClient = OAuthWebViewClient(oAuthHelper, this, userDao)
             if (BuildConfig.DEBUG) {
                 WebView.setWebContentsDebuggingEnabled(true)
             }
         }.loadUrl(oAuthHelper.getAuthorizationUrl(true, true, scopes))
     }
 
-    private class OAuthWebViewClient(val authHelper: StatefulAuthHelper, val activity: AppCompatActivity) :
+    private class OAuthWebViewClient(
+        val authHelper: StatefulAuthHelper,
+        val activity: AppCompatActivity,
+        val userDao: UserDao
+    ) :
         WebViewClient() {
         override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
             if (authHelper.isFinalRedirectUrl(url)) {
@@ -46,7 +55,7 @@ class OAuthActivity : AppCompatActivity() {
                 view.stopLoading()
                 launch {
                     authHelper.onUserChallenge(url).authManager.tokenStore
-                    Matter.provideDatabase().userDao().insert(UserEntity(Matter.accountHelper.reddit.me().username, 1))
+                    userDao.insert(UserEntity(Matter.accountHelper.reddit.me().username, 1))
                     launch(UI) {
                         activity.apply {
                             setResult(Activity.RESULT_OK)

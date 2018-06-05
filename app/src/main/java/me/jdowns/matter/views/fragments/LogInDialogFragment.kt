@@ -16,11 +16,20 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import me.jdowns.matter.Matter
 import me.jdowns.matter.R
+import me.jdowns.matter.room.user.UserDao
 import me.jdowns.matter.views.activities.OAuthActivity
+import javax.inject.Inject
 
 class LogInDialogFragment : android.support.v4.app.DialogFragment() {
+    @Inject
+    lateinit var userDao: UserDao
     private val usernames = mutableListOf<String>()
     private lateinit var usernameSpinner: Spinner
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Matter.dependencyGraph.inject(this)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.dialog_fragment_log_in, container, false)
 
@@ -49,7 +58,7 @@ class LogInDialogFragment : android.support.v4.app.DialogFragment() {
     @UiThread
     private suspend fun setUpView() {
         async {
-            Matter.provideDatabase().userDao().getAllUsernames()
+            userDao.getAllUsernames()
         }.await()?.let {
             if (it.isNotEmpty()) {
                 usernames.addAll(it)
@@ -63,7 +72,7 @@ class LogInDialogFragment : android.support.v4.app.DialogFragment() {
     @UiThread
     private suspend fun logInUser(username: String) {
         launch {
-            Matter.provideDatabase().userDao().setLoggedIn(username)
+            userDao.setLoggedIn(username)
         }.join()
         dismissFamily()
         activity?.recreate()
