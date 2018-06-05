@@ -37,13 +37,13 @@ abstract class BaseFragmentWithRecyclerView<T : UniquelyIdentifiable> : android.
                 } else {
                     lastDataSet = newDataSet
                     dataSet.addAll(newDataSet)
-                }
-                launch(UI) {
-                    recyclerView.adapter.notifyItemRangeInserted(
-                        (recyclerView.adapter.itemCount + if (recyclerView.adapter.itemCount == newDataSet.size) 0 else 1) - newDataSet.size,
-                        newDataSet.size
-                    )
-                    updateView()
+                    launch(UI) {
+                        recyclerView.adapter.notifyItemRangeInserted(
+                            (recyclerView.adapter.itemCount + if (recyclerView.adapter.itemCount == newDataSet.size) 0 else 1) - newDataSet.size,
+                            newDataSet.size
+                        )
+                        updateView()
+                    }
                 }
             }
         } else {
