@@ -2,6 +2,8 @@ package me.jdowns.matter.views.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
@@ -23,6 +25,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
+
         findViewById<ImageButton>(R.id.action_bar_profile).setOnClickListener {
             ProfileBottomSheetDialogFragment().show(
                 supportFragmentManager,
@@ -30,35 +33,35 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        setUpViewForUser()
-    }
-
-    private fun setUpViewForUser() {
-        launch {
-            setUpUser()
-            launch(UI) {
-                bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_bar)!!.apply {
-                    visibility = if (Matter.isRealUser()) View.VISIBLE else View.GONE
-                    setOnNavigationItemSelectedListener {
-                        addFragment(it)
-                        true
-                    }
-                }
-                findViewById<ViewGroup>(R.id.bottom_navigation_bar).visibility =
-                        if (Matter.isRealUser()) View.VISIBLE else View.GONE
-                addFragment()
-            }
+        launch(UI) {
+            setUpViewForUser()
         }
     }
 
-    private suspend fun setUpUser() {
+    @UiThread
+    private suspend fun setUpViewForUser() {
         launch {
-            try {
-                Matter.accountHelper.switchToUser(Matter.provideDatabase().userDao().getLoggedIn()?.username!!)
-            } catch (e: Exception) {
-                Matter.accountHelper.switchToUserless()
-            }
+            setUpUser()
         }.join()
+        bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation_bar)!!.apply {
+            visibility = if (Matter.isRealUser()) View.VISIBLE else View.GONE
+            setOnNavigationItemSelectedListener {
+                addFragment(it)
+                true
+            }
+        }
+        findViewById<ViewGroup>(R.id.bottom_navigation_bar).visibility =
+                if (Matter.isRealUser()) View.VISIBLE else View.GONE
+        addFragment()
+    }
+
+    @WorkerThread
+    private fun setUpUser() {
+        try {
+            Matter.accountHelper.switchToUser(Matter.provideDatabase().userDao().getLoggedIn()?.username!!)
+        } catch (e: Exception) {
+            Matter.accountHelper.switchToUserless()
+        }
     }
 
     private fun addFragment(menuItem: MenuItem? = null) {
@@ -106,12 +109,5 @@ class MainActivity : AppCompatActivity() {
             /** TODO: Handle other results from OAuthActivity */
             Toast.makeText(applicationContext, R.string.authentication_issue, Toast.LENGTH_LONG).show()
         }
-    }
-
-    override fun recreate() {
-        supportFragmentManager.beginTransaction()
-            .remove(supportFragmentManager.findFragmentByTag(SubmissionFragment.FRAGMENT_TAG))
-            .commitNowAllowingStateLoss()
-        super.recreate()
     }
 }

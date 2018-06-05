@@ -15,8 +15,6 @@ import net.dean.jraw.oauth.AccountHelper
 import net.dean.jraw.oauth.AuthMethod
 import java.util.*
 
-/** TODO: Investigate address fault on start up */
-// Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x18 in tid 31986 (onPool-worker-2), pid 31887 (e.jdowns.matter)
 class Matter : Application() {
 
     init {
@@ -54,7 +52,7 @@ class Matter : Application() {
 
         @Synchronized
         override fun provideDatabase(): MatterDatabase {
-            if (database == null) {
+            return database ?: kotlin.run {
                 database = Room.databaseBuilder(
                     application!!.applicationContext,
                     MatterDatabase::class.java,
@@ -62,8 +60,8 @@ class Matter : Application() {
                 )
                     .fallbackToDestructiveMigration()
                     .build()
+                return database!!
             }
-            return database!!
         }
     }
 }

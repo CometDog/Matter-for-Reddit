@@ -2,6 +2,7 @@ package me.jdowns.matter.views.adapters
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.support.annotation.UiThread
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.text.SpannableString
@@ -67,16 +68,19 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.submissionCardViewLayout.visibility = View.INVISIBLE
 
-        with(dataSet[position]) {
-            setUsername(holder, this)
-            setPostTime(holder, this)
-            setType(holder, this)
-            setTitle(holder, this)
-            setSubreddit(holder, this)
-            setFlair(holder, this)
-            setThumbnail(holder, this)
-            setScore(holder, this)
-            setCommentCount(holder, this)
+        kotlin.run {
+            val submission = dataSet[position]
+            setUsername(holder, submission)
+            setPostTime(holder, submission)
+            setType(holder, submission)
+            setTitle(holder, submission)
+            setSubreddit(holder, submission)
+            setFlair(holder, submission)
+            launch(UI) {
+                setThumbnail(holder, submission)
+            }
+            setScore(holder, submission)
+            setCommentCount(holder, submission)
         }
 
         super.onBindViewHolder(holder, position)
@@ -145,26 +149,23 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
         }
     }
 
-    private fun setThumbnail(holder: ViewHolder, submission: Submission) {
+    @UiThread
+    private suspend fun setThumbnail(holder: ViewHolder, submission: Submission) {
         if (!submission.isSelfPost && submission.hasThumbnail() && !submission.thumbnail.isNullOrBlank() && submission.thumbnail!!.matches(
                 Regex("^http.?://.*")
             )
         ) {
-            launch {
-                val bitmap = thumbnailCache.get(submission.uniqueId)?.run {
-                    Bitmap.createBitmap(this)
-                } ?: async {
-                    BitmapFactory.decodeStream(URL(submission.thumbnail).content as InputStream)
-                }.await()
-                launch(UI) {
-                    with(holder) {
-                        if (oldPosition == -1 || oldPosition == layoutPosition) {
-                            thumbnailImageView.setImageBitmap(bitmap)
-                            imageCardView.visibility = View.VISIBLE
-                            adjustTitle(this, submission)
-                            thumbnailCache.put(submission.uniqueId, bitmap)
-                        }
-                    }
+            val bitmap = thumbnailCache.get(submission.uniqueId)?.run {
+                Bitmap.createBitmap(this)
+            } ?: async {
+                BitmapFactory.decodeStream(URL(submission.thumbnail).content as InputStream)
+            }.await()
+            with(holder) {
+                if (oldPosition == -1 || oldPosition == layoutPosition) {
+                    thumbnailImageView.setImageBitmap(bitmap)
+                    imageCardView.visibility = View.VISIBLE
+                    adjustTitle(this, submission)
+                    thumbnailCache.put(submission.uniqueId, bitmap)
                 }
             }
         } else {
@@ -186,7 +187,7 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
     }
 
     private fun getTimeDiffString(submissionDate: Date): String {
-        return run {
+        return kotlin.run {
             val timeDiffSeconds = (Date().time - submissionDate.time) / 1000L
             val timeUnit = TimeUnit.SECONDS
             when {

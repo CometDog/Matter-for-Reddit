@@ -2,6 +2,7 @@ package me.jdowns.matter.views.fragments
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.support.annotation.UiThread
 import android.support.design.widget.BottomSheetDialogFragment
 import android.view.LayoutInflater
 import android.view.View
@@ -44,21 +45,22 @@ class ProfileBottomSheetDialogFragment : BottomSheetDialogFragment() {
             .setMessage(R.string.confirm_log_out)
             .setCancelable(true)
             .setPositiveButton(android.R.string.yes, { _, _ ->
-                logOut()
+                launch(UI) {
+                    logOut()
+                }
             })
             .setNegativeButton(android.R.string.no, { dialog, _ ->
                 dialog.cancel()
             }).create().show()
     }
 
-    private fun logOut() {
+    @UiThread
+    private suspend fun logOut() {
         launch {
             Matter.provideDatabase().userDao().setLoggedOut(Matter.accountHelper.reddit.me().username)
-            launch(UI) {
-                dismiss()
-                activity!!.recreate()
-            }
-        }
+        }.join()
+        dismiss()
+        activity!!.recreate()
     }
 
     companion object {

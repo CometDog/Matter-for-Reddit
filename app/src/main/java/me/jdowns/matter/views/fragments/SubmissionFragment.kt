@@ -66,7 +66,6 @@ class SubmissionFragment : BaseFragmentWithRecyclerView<Submission>(), SwipeRefr
             dataSet.clear()
             recyclerView.adapter.notifyDataSetChanged()
         }
-        hasMorePages = true
         paginator.restart()
         tryGetMore()
     }

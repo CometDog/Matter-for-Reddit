@@ -2,6 +2,7 @@ package me.jdowns.matter.views.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.UiThread
 import android.support.v4.app.DialogFragment
 import android.view.LayoutInflater
 import android.view.View
@@ -31,35 +32,41 @@ class LogInDialogFragment : android.support.v4.app.DialogFragment() {
         }
 
         view.findViewById<TextView>(R.id.log_in_button).setOnClickListener({
-            logInUser(view.findViewById<Spinner>(R.id.log_in_spinner).selectedItem.toString())
+            launch(UI) {
+                logInUser(view.findViewById<Spinner>(R.id.log_in_spinner).selectedItem.toString())
+            }
         })
 
         view.findViewById<Button>(R.id.new_user_button).setOnClickListener({
             startOAuthActivity()
         })
 
-        launch {
-            getUsernames()?.let {
-                usernames.addAll(it)
-                launch(UI) {
-                    (usernameSpinner.adapter as ArrayAdapter<*>).notifyDataSetChanged()
-                }
-            } ?: startOAuthActivity()
+        launch(UI) {
+            setUpView()
         }
     }
 
-    private suspend fun getUsernames(): List<String>? = async {
-        Matter.provideDatabase().userDao().getAllUsernames()
-    }.await()
+    @UiThread
+    private suspend fun setUpView() {
+        async {
+            Matter.provideDatabase().userDao().getAllUsernames()
+        }.await()?.let {
+            if (it.isNotEmpty()) {
+                usernames.addAll(it)
+                (usernameSpinner.adapter as ArrayAdapter<*>).notifyDataSetChanged()
+            } else {
+                startOAuthActivity()
+            }
+        } ?: startOAuthActivity()
+    }
 
-    private fun logInUser(username: String) {
+    @UiThread
+    private suspend fun logInUser(username: String) {
         launch {
             Matter.provideDatabase().userDao().setLoggedIn(username)
-            launch(UI) {
-                dismissFamily()
-                activity?.recreate()
-            }
-        }
+        }.join()
+        dismissFamily()
+        activity?.recreate()
     }
 
     private fun startOAuthActivity() {

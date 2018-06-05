@@ -1,5 +1,6 @@
 package me.jdowns.matter.views.fragments
 
+import android.support.annotation.UiThread
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import kotlinx.coroutines.experimental.Deferred
@@ -16,8 +17,6 @@ abstract class BaseFragmentWithRecyclerView<T : UniquelyIdentifiable> : android.
     protected open val paginator: Paginator<T>? = null
     protected lateinit var recyclerView: RecyclerView
     protected val dataSet: MutableList<T> = mutableListOf()
-    private var lastDataSet: MutableList<T> = mutableListOf()
-    protected var hasMorePages: Boolean = true
     protected lateinit var job: Deferred<Listing<T>>
 
     override fun atEnd() = tryGetMore()
@@ -25,30 +24,26 @@ abstract class BaseFragmentWithRecyclerView<T : UniquelyIdentifiable> : android.
     protected abstract fun updateView()
 
     protected fun tryGetMore() {
-        if (hasMorePages) {
-            launch {
-                val newDataSet = async {
-                    paginator!!.next()
-                }.await()
-                if (lastDataSet == newDataSet) {
-                    hasMorePages = false
-                    lastDataSet.clear()
-                    logNoMorePage()
-                } else {
-                    lastDataSet = newDataSet
-                    dataSet.addAll(newDataSet)
-                    launch(UI) {
-                        recyclerView.adapter.notifyItemRangeInserted(
-                            (recyclerView.adapter.itemCount + if (recyclerView.adapter.itemCount == newDataSet.size) 0 else 1) - newDataSet.size,
-                            newDataSet.size
-                        )
-                        updateView()
-                    }
-                }
+        if (paginator!!.iterator().hasNext()) {
+            launch(UI) {
+                getMore()
             }
         } else {
             logNoMorePage()
         }
+    }
+
+    @UiThread
+    private suspend fun getMore() {
+        val newDataSet = async {
+            paginator!!.next()
+        }.await()
+        dataSet.addAll(newDataSet)
+        recyclerView.adapter.notifyItemRangeInserted(
+            (recyclerView.adapter.itemCount + if (recyclerView.adapter.itemCount == newDataSet.size) 0 else 1) - newDataSet.size,
+            newDataSet.size
+        )
+        updateView()
     }
 
     private fun logNoMorePage() {
