@@ -11,9 +11,13 @@
     <string name="share">Share</string>
     <string name="settings">Settings</string>
     <string name="username">Username</string>
-    <string name="log_in">Log In</string>
+    <string name="log_out">Log out</string>
+    <string name="log_in">Log in</string>
     <string name="authentication_issue">There was an issue authenticating. Check your Reddit account for possible problems and try again.</string>
     <string name="front_page">Front Page</string>
+    <string name="confirm_log_out">Are you sure you want to log out?</string>
+    <string name="new_user">New user</string>
+    <string name="accounts">Accounts</string>
 
     <!-- Reddit templates -->
     <string name="subreddit_qualifier">/r/%s</string>

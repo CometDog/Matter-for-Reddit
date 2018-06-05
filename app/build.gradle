@@ -12,6 +12,11 @@ android {
         versionCode 1
         versionName "0.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas".toString())
+            }
+        }
     }
     buildTypes {
         release {
@@ -39,10 +44,8 @@ dependencies {
     implementation "net.dean.jraw:JRAW:$jrawVersion"
     implementation "net.dean.jraw:JRAW-Android:$jrawVersion"
     implementation "android.arch.persistence.room:runtime:$roomVersion"
-    annotationProcessor "android.arch.persistence.room:compiler:$roomVersion"
+
     kapt "android.arch.persistence.room:compiler:$roomVersion"
-
-
 
     testImplementation 'junit:junit:4.12'
 

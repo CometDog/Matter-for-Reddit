@@ -150,10 +150,12 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
                 Regex("^http.?://.*")
             )
         ) {
-            async {
+            launch {
                 val bitmap = thumbnailCache.get(submission.uniqueId)?.run {
                     Bitmap.createBitmap(this)
-                } ?: BitmapFactory.decodeStream(URL(submission.thumbnail).content as InputStream)
+                } ?: async {
+                    BitmapFactory.decodeStream(URL(submission.thumbnail).content as InputStream)
+                }.await()
                 launch(UI) {
                     with(holder) {
                         if (oldPosition == -1 || oldPosition == layoutPosition) {

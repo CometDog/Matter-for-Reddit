@@ -4,10 +4,12 @@ import android.app.Activity
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import me.jdowns.matter.BuildConfig
 import me.jdowns.matter.Matter
 import me.jdowns.matter.R
@@ -36,21 +38,28 @@ class OAuthActivity : AppCompatActivity() {
         }.loadUrl(oAuthHelper.getAuthorizationUrl(true, true, scopes))
     }
 
-    private class OAuthWebViewClient(val authHelper: StatefulAuthHelper, val activity: AppCompatActivity?) :
+    private class OAuthWebViewClient(val authHelper: StatefulAuthHelper, val activity: AppCompatActivity) :
         WebViewClient() {
         override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
             if (authHelper.isFinalRedirectUrl(url)) {
+                activity.findViewById<ViewGroup>(R.id.oauth_progress_bar_layout).visibility = View.VISIBLE
                 view.stopLoading()
-                async {
+                launch {
                     authHelper.onUserChallenge(url).authManager.tokenStore
                     Matter.provideDatabase().userDao().insert(UserEntity(Matter.accountHelper.reddit.me().username, 1))
-                    async(UI) {
-                        activity?.setResult(Activity.RESULT_OK)
-                        activity?.finish()
+                    launch(UI) {
+                        activity.apply {
+                            setResult(Activity.RESULT_OK)
+                        }.finish()
                     }
                 }
             }
         }
+    }
+
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_CANCELED)
+        super.onBackPressed()
     }
 
     companion object {

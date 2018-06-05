@@ -5,6 +5,7 @@ import android.util.Log
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import me.jdowns.matter.views.widgets.BaseRecyclerView
 import net.dean.jraw.models.Listing
 import net.dean.jraw.models.UniquelyIdentifiable
@@ -25,8 +26,10 @@ abstract class BaseFragmentWithRecyclerView<T : UniquelyIdentifiable> : android.
 
     protected fun tryGetMore() {
         if (hasMorePages) {
-            async {
-                val newDataSet = paginator!!.next()
+            launch {
+                val newDataSet = async {
+                    paginator!!.next()
+                }.await()
                 if (lastDataSet == newDataSet) {
                     hasMorePages = false
                     lastDataSet.clear()
@@ -34,13 +37,13 @@ abstract class BaseFragmentWithRecyclerView<T : UniquelyIdentifiable> : android.
                 } else {
                     lastDataSet = newDataSet
                     dataSet.addAll(newDataSet)
-                    async(UI) {
-                        recyclerView.adapter.notifyItemRangeInserted(
-                            (recyclerView.adapter.itemCount + if (recyclerView.adapter.itemCount == newDataSet.size) 0 else 1) - newDataSet.size,
-                            newDataSet.size
-                        )
-                        updateView()
-                    }
+                }
+                launch(UI) {
+                    recyclerView.adapter.notifyItemRangeInserted(
+                        (recyclerView.adapter.itemCount + if (recyclerView.adapter.itemCount == newDataSet.size) 0 else 1) - newDataSet.size,
+                        newDataSet.size
+                    )
+                    updateView()
                 }
             }
         } else {

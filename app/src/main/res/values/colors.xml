@@ -6,4 +6,5 @@
 
     <!-- Material -->
     <color name="gray_200">#EEEEEE</color>
+    <color name="red_500">#F44336</color>
 </resources>
