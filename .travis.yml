@@ -1,0 +1,39 @@
+env:
+  ANDROID_HOME: $HOME/android-sdk
+  reddit:
+    clientid:
+      secure: W5BWiYC/0R2bKKPsulz/lpVokuk73gcjYEIJvphPvCHOK5hWBgv/VrEUuoJGGwtIJeTjZ4GjdBGjFsagarhyQrz59U+NFkhWIHo6S4xtYFAzO+C7cBimlKcDra/0R6XOXv4gjDbZlaaeTimE8uOgaPURxvZnw1/ZhRldavJOzlu43sPRXvJ/rP7PojUxH6sYByVJ14n6tWccYx5K2MkfyiIxcHfTqbmxEKOt0fLV9TeHZzNeFcdr3XilC6tWO5roqCPn+Ml91627X8BNO9v+PAAhiULfHLmy574KON+mTYoATyWKGgEe8qnne5qwLzDzPwQYHC6XpnKrw5757ivikUWhzBEmG2XJ3LUZCVCHHCwOHJzabZWgV8PPCP4MMwXLBlIrNDzLqZS++50dJBr56Vpsvxs/ITH5QGZo72ofWCfemnu5PZiORwQu+80vDBz4PXpb4W9nzIvTM2TT1XmC0ydzy6x19cw4dZeQtx6BUMlhXeRMCfzykYbGBwADVIf0mneWvEgFRl3WfzuH00R+8m0FwiZ/xRmTnN82uy+Cmy4l2A2X+pxRf2rSv+WI9d8NJxP3BXjgiGOVdAxp3FhoDO6iFZVFuD8DXzK7DxrGtaSu4XSPd6whECQgKe12CB4XkTryq4xBzMbX0cg9bH0f/oryfzNF3DYzK3EbZQnaL9o=
+    username:
+      secure: I31awc6ETJ97Hc6GCOPJNXqTUpfVJao6eWp24rNcu/lzxShZJSvR2jiUDfnjPLgDllVajATizuF96cmLffAsQWmYm6w52FRRSggQzED+OokzGPZqVgosa2Q4LMryStIFsDW9sbN1bsqi9crjfngGvlvu2+WtOhAmsBwdpRDKeB4oahO+FfLb+XYDdrMAj1Lr5a/lmbOxfO7Xoe97Icf0l3ftnC32HakCmpgEK5XL4Ca3Kq+oOxxMcXeFbunwYFU04RFXjCJGxKKxHQwUC/KTpGzjlChUSULzr7D2qH3wSYmB3GaiktfIdctgAj1em/W3wwYIjwZkzIL9uo23LUoV/WXSeFjigUtJeRV4Wguq19OMlWuOne6guxpYr5HsBm4ZX9VqEoztlr9JX2JveBcl10SgqICTluNWX6qdxajeZpP47CG7LE7BbxDAO3ZrF/ZDQ9GdFWGQ26t56teXz4T9V0dH5+4gJV2pOT722hjEhT2s3zDY6G6kTmWS6GN9e5j7mvxEfGllbqvvuM68Rhv2YTUqVnqM0/FNYbxq3CLQDRSUQ85bNhO9FFV+X4xDF/KxvVatPM1PyNNXR5ehDmu6vwu4Xcl/VFXuWz2pAWS5waEq+cfUOPsflrmoZI/X0l6RUuhU4gM4vfsFh2gPxjZbJZfHTZwf1EQDQaV1WW9ta4k=
+    redirecturl:
+      secure: G2fvF9q+c10MS78MtjozL+kHWc778fbx6voQ7v8XOj29XCd8Fr/80OmvwCLX9Cb/jIgbDPquw1eykKqcOUfyEWUshrNdBZumsV4jF5zvs6hTIt6asTO8dFvborVxkyduftWnKN3EWBTSaTl8hYyMbUwwuPmsZp2ZSF02eSUfn+iW5iawx8vjr2TFiG/HL4HIK2ltfHqRy014KbPPCJncqAlJUIHjDy6RujAFtjOBJWPNMaekYQZiglpFBNi9/WAtymTYI7DrEfXopdbQZNs6erefwbUlD8l6eGaKuf4S709OXCpILSR828Cvv5DhNmWfpKy00NYETrbkwjCvDBUcgPoBx1gjZYQY2FUPsOLwNpTzFgBUlE7rLjFVU1FiS73cu57iFwkYxoNcK8didIwSTzc78VoVmRAJIvaUt6stH+ioNJm7iLx2UjcdOE7aZCwN1dN6hOc+g+AMM+t9/roc15MiGOUbnmbsyPAW0PxNa2v1ceaNu6SYnZRCws0HyDUi4BJmz8L33wyFdjq90KA/jQiPYuS3N3jxqnZyTfzvx5hREgw6DyOUhF6YPWlyNxYIoe17i6H8ET6C9Ajmagv8IcMF2BUNScX4b7wgCzegO2+ss1DP0EIfLK1tyYFHvH7fhcGczLiFL91Woha9iI45DZPy9lyaz5C2a+IN71tely4=
+
+language: android
+jdk: oraclejdk8
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/android-sdk-dl
+    - $HOME/android-sdk
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+
+before_install:
+  - yes | sdkmanager "platforms;android-27"
+
+install:
+  - if test ! -e $HOME/android-sdk-dl/sdk-tools.zip ; then curl https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip > $HOME/android-sdk-dl/sdk-tools.zip ; fi
+  - unzip -qq -n $HOME/android-sdk-dl/sdk-tools.zip -d $HOME/android-sdk
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'tools' > /dev/null
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'platform-tools' > /dev/null
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'build-tools;27.0.3' > /dev/null
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'platforms;android-27' > /dev/null
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;google;m2repository' > /dev/null
+
+before_script:
+  - chmod +x gradlew
+script:
+  - ./gradlew --no-daemon build -PredditClientId=$REDDIT_CLIENT_ID -PredditUsername=$REDDIT_USERNAME -PredditRedirectUrl=$REDDIT_REDIRECT_URL

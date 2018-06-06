@@ -17,6 +17,9 @@ android {
                 arg("room.schemaLocation", "$projectDir/schemas".toString())
             }
         }
+        resValue 'string', 'redditClientId', findProperty("redditClientId").toString()
+        resValue 'string', 'redditUsername', findProperty("redditUsername").toString()
+        resValue 'string', 'redditRedirectUrl', findProperty("redditRedirectUrl").toString()
     }
     buildTypes {
         release {

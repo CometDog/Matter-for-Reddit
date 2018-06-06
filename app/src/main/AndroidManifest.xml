@@ -12,13 +12,13 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="net.dean.jraw.android.REDDIT_USERNAME"
-            android:value="@string/reddit_username" />
+            android:value="@string/redditUsername" />
         <meta-data
             android:name="net.dean.jraw.android.CLIENT_ID"
-            android:value="@string/client_id" />
+            android:value="@string/redditClientId" />
         <meta-data
             android:name="net.dean.jraw.android.REDIRECT_URL"
-            android:value="@string/redirect_url" />
+            android:value="@string/redditRedirectUrl" />
 
         <activity
             android:name=".views.activities.main.MainActivity"
