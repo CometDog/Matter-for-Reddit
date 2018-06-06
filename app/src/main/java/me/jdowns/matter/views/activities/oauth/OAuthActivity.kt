@@ -8,6 +8,7 @@ import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
+import kotlinx.coroutines.experimental.launch
 import me.jdowns.matter.BuildConfig
 import me.jdowns.matter.R
 import net.dean.jraw.oauth.StatefulAuthHelper
@@ -22,7 +23,9 @@ class OAuthActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_oauth)
-        presenter.onCreated()
+        launch {
+            presenter.onCreated()
+        }
     }
 
     fun startLoading() {
@@ -35,14 +38,13 @@ class OAuthActivity : AppCompatActivity() {
         finish()
     }
 
-    fun setUpWebView(oAuthHelper: StatefulAuthHelper, webViewClient: WebViewClient) {
+    fun setUpWebView(oAuthHelper: StatefulAuthHelper, webViewClient: WebViewClient) =
         findViewById<WebView>(R.id.oauth_webview)!!.apply {
             this.webViewClient = webViewClient
             if (BuildConfig.DEBUG) {
                 WebView.setWebContentsDebuggingEnabled(true)
             }
         }.loadUrl(oAuthHelper.getAuthorizationUrl(true, true, scopes))
-    }
 
     override fun onBackPressed() {
         setResult(Activity.RESULT_CANCELED)

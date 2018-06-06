@@ -3,9 +3,9 @@ package me.jdowns.matter.views.activities.main
 import android.support.annotation.UiThread
 import me.jdowns.matter.Matter
 import me.jdowns.matter.R
-import me.jdowns.matter.views.fragments.ProfileBottomSheetDialogFragment
 import me.jdowns.matter.views.fragments.SubmissionFragment
 import me.jdowns.matter.views.fragments.SubredditFragment
+import me.jdowns.matter.views.fragments.profilebottomsheetdialog.ProfileBottomSheetDialogFragment
 
 @UiThread
 class MainNavigator(private val view: MainActivity) {
@@ -31,10 +31,8 @@ class MainNavigator(private val view: MainActivity) {
             .commit()
     }
 
-    fun showProfileBottomSheet() {
-        ProfileBottomSheetDialogFragment().show(
-            view.supportFragmentManager,
-            ProfileBottomSheetDialogFragment.FRAGMENT_TAG
-        )
-    }
+    fun showProfileBottomSheet() = ProfileBottomSheetDialogFragment().show(
+        view.supportFragmentManager,
+        ProfileBottomSheetDialogFragment.FRAGMENT_TAG
+    )
 }

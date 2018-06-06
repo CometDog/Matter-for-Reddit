@@ -23,22 +23,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
         setUpProfileButton()
-        launch(UI) {
-            setUpInitialView()
-        }
+        setUpInitialView()
     }
 
-    private suspend fun setUpInitialView() {
+    private fun setUpInitialView() {
         launch {
             presenter.onTryLogIn()
-        }.join()
-        navigator.showInitialSubmissionView()
+            launch(UI) {
+                navigator.showInitialSubmissionView()
+            }
+        }
     }
 
-    private fun setUpProfileButton() {
-        findViewById<ImageButton>(R.id.action_bar_profile).setOnClickListener {
-            navigator.showProfileBottomSheet()
-        }
+    private fun setUpProfileButton() = findViewById<ImageButton>(R.id.action_bar_profile).setOnClickListener {
+        navigator.showProfileBottomSheet()
     }
 
     fun setUpUserSpecificView(realUser: Boolean) {

@@ -5,8 +5,8 @@ import dagger.android.AndroidInjectionModule
 import me.jdowns.matter.dagger.modules.RoomModule
 import me.jdowns.matter.views.activities.main.MainPresenter
 import me.jdowns.matter.views.activities.oauth.OAuthPresenter
-import me.jdowns.matter.views.fragments.LogInDialogFragment
-import me.jdowns.matter.views.fragments.ProfileBottomSheetDialogFragment
+import me.jdowns.matter.views.fragments.logindialog.LogInDialogPresenter
+import me.jdowns.matter.views.fragments.profilebottomsheetdialog.ProfileBottomSheetDialogPresenter
 import javax.inject.Singleton
 
 @Singleton
@@ -14,6 +14,6 @@ import javax.inject.Singleton
 interface ApplicationComponent {
     fun inject(mainPresenter: MainPresenter)
     fun inject(oAuthPresenter: OAuthPresenter)
-    fun inject(logInDialogFragment: LogInDialogFragment)
-    fun inject(profileBottomSheetDialogFragment: ProfileBottomSheetDialogFragment)
+    fun inject(logInDialogPresenter: LogInDialogPresenter)
+    fun inject(profileBottomSheetDialogPresenter: ProfileBottomSheetDialogPresenter)
 }
