@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 class OAuthActivity : AppCompatActivity() {
     @Inject
-    lateinit var userDao: UserDao
+    internal lateinit var userDao: UserDao
     private val scopes =
         "edit, history, identity, livemanage, modconfig, modcontributors, modmail, modothers, modposts, modself, mysubreddits, privatemessages, read, report, save, submit, subscribe, vote"
 

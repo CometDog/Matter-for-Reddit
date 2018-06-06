@@ -19,7 +19,10 @@
         <meta-data
             android:name="net.dean.jraw.android.REDIRECT_URL"
             android:value="@string/redirect_url" />
-        <activity android:name=".views.activities.MainActivity" android:label="@string/appName">
+
+        <activity
+            android:name=".views.activities.main.MainActivity"
+            android:label="@string/appName">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />

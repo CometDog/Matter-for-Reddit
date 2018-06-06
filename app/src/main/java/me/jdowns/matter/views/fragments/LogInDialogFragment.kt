@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 class LogInDialogFragment : android.support.v4.app.DialogFragment() {
     @Inject
-    lateinit var userDao: UserDao
+    internal lateinit var userDao: UserDao
     private val usernames = mutableListOf<String>()
     private lateinit var usernameSpinner: Spinner
     override fun onCreate(savedInstanceState: Bundle?) {

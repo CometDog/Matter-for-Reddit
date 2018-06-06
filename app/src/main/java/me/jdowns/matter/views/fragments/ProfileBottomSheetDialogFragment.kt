@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 class ProfileBottomSheetDialogFragment : BottomSheetDialogFragment() {
     @Inject
-    lateinit var userDao: UserDao
+    internal lateinit var userDao: UserDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -2,8 +2,8 @@ package me.jdowns.matter
 
 import android.app.Application
 import android.util.Log
-import me.jdowns.matter.dagger.modules.ApplicationComponent
-import me.jdowns.matter.dagger.modules.DaggerApplicationComponent
+import me.jdowns.matter.dagger.ApplicationComponent
+import me.jdowns.matter.dagger.DaggerApplicationComponent
 import me.jdowns.matter.dagger.modules.RoomModule
 import net.dean.jraw.RedditClient
 import net.dean.jraw.android.AndroidHelper
@@ -18,9 +18,7 @@ import java.util.*
 class Matter : Application() {
     override fun onCreate() {
         super.onCreate()
-        dependencyGraph = DaggerApplicationComponent.builder().roomModule(RoomModule(this)).build().also {
-            it.inject(this)
-        }
+        dependencyGraph = DaggerApplicationComponent.builder().roomModule(RoomModule(this)).build()
 
         tokenStore = SharedPreferencesTokenStore(applicationContext).apply {
             load()
