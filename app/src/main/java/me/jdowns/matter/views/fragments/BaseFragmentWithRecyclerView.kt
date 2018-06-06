@@ -39,8 +39,8 @@ abstract class BaseFragmentWithRecyclerView<T : UniquelyIdentifiable> : android.
             paginator!!.next()
         }.await()
         dataSet.addAll(newDataSet)
-        recyclerView.adapter.notifyItemRangeInserted(
-            (recyclerView.adapter.itemCount + if (recyclerView.adapter.itemCount == newDataSet.size) 0 else 1) - newDataSet.size,
+        recyclerView.adapter!!.notifyItemRangeInserted(
+            (recyclerView.adapter!!.itemCount + if (recyclerView.adapter!!.itemCount == newDataSet.size) 0 else 1) - newDataSet.size,
             newDataSet.size
         )
         updateView()

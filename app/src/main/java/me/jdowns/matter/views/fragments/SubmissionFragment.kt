@@ -64,7 +64,7 @@ class SubmissionFragment : BaseFragmentWithRecyclerView<Submission>(), SwipeRefr
     override fun onRefresh() {
         if (dataSet.size > 0) {
             dataSet.clear()
-            recyclerView.adapter.notifyDataSetChanged()
+            recyclerView.adapter!!.notifyDataSetChanged()
         }
         paginator.restart()
         tryGetMore()

@@ -4,24 +4,26 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     defaultConfig {
         applicationId "me.jdowns.matter"
         minSdkVersion 19
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 1
         versionName "0.0.1"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         kapt {
             arguments {
                 arg("room.schemaLocation", "$projectDir/schemas".toString())
             }
         }
-        resValue 'string', 'redditClientId', findProperty("redditClientId").toString()
-        resValue 'string', 'redditUsername', findProperty("redditUsername").toString()
-        resValue 'string', 'redditRedirectUrl', findProperty("redditRedirectUrl").toString()
     }
     buildTypes {
+        buildTypes.each {
+            it.resValue 'string', 'redditClientId', findProperty("redditClientId").toString()
+            it.resValue 'string', 'redditUsername', findProperty("redditUsername").toString()
+            it.resValue 'string', 'redditRedirectUrl', findProperty("redditRedirectUrl").toString()
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -32,38 +34,34 @@ android {
     }
 }
 
-ext.androidSupportVersion = '27.1.1'
-ext.jrawVersion = '1.1.0'
-ext.roomVersion = '1.1.0'
-ext.kotlinCoroutinesVersion = '0.22.5'
-ext.daggerVersion = '2.16'
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
-    implementation "com.android.support:appcompat-v7:$androidSupportVersion"
-    implementation "com.android.support:design:$androidSupportVersion"
+
+    //Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.41"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.5"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:0.22.5"
+
+    //Android
+    implementation "com.android.support:appcompat-v7:28.0.0-alpha1"
+    implementation "com.android.support:design:28.0.0-alpha1"
     implementation 'com.android.support.constraint:constraint-layout:1.1.1'
-    implementation "com.android.support:support-vector-drawable:$androidSupportVersion"
-    implementation "com.android.support:cardview-v7:$androidSupportVersion"
-    implementation "net.dean.jraw:JRAW:$jrawVersion"
-    implementation "net.dean.jraw:JRAW-Android:$jrawVersion"
-    implementation "android.arch.persistence.room:runtime:$roomVersion"
-    implementation "io.reactivex.rxjava2:rxjava:2.1.14"
-    implementation "io.reactivex.rxjava2:rxandroid:2.0.2"
-    implementation "com.google.dagger:dagger:$daggerVersion"
-    implementation "com.google.dagger:dagger-android-support:$daggerVersion"
+    implementation "com.android.support:support-vector-drawable:28.0.0-alpha1"
+    implementation "com.android.support:cardview-v7:28.0.0-alpha1"
 
-    kapt "android.arch.persistence.room:compiler:$roomVersion"
-    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
-    kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
+    //JRAW
+    implementation "net.dean.jraw:JRAW:1.1.0"
+    implementation "net.dean.jraw:JRAW-Android:1.1.0"
 
-    testImplementation 'junit:junit:4.12'
+    //Room
+    implementation "android.arch.persistence.room:runtime:1.1.0"
+    kapt "android.arch.persistence.room:compiler:1.1.0"
 
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    //Dagger
+    implementation "com.google.dagger:dagger:2.16"
+    implementation "com.google.dagger:dagger-android-support:2.16"
+    kapt "com.google.dagger:dagger-compiler:2.16"
+    kapt "com.google.dagger:dagger-android-processor:2.16"
 }
 
 kotlin {
