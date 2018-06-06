@@ -13,6 +13,7 @@ import kotlinx.coroutines.experimental.launch
 import me.jdowns.matter.R
 import me.jdowns.matter.views.fragments.SubmissionFragment
 
+@UiThread
 class MainActivity : AppCompatActivity() {
     private val presenter = MainPresenter(this)
     private val navigator = MainNavigator(this)
@@ -27,11 +28,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @UiThread
     private suspend fun setUpInitialView() {
-        presenter.onTryLogIn()
+        launch {
+            presenter.onTryLogIn()
+        }.join()
         navigator.showInitialSubmissionView()
-
     }
 
     private fun setUpProfileButton() {

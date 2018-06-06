@@ -17,7 +17,7 @@ import kotlinx.coroutines.experimental.launch
 import me.jdowns.matter.Matter
 import me.jdowns.matter.R
 import me.jdowns.matter.room.user.UserDao
-import me.jdowns.matter.views.activities.OAuthActivity
+import me.jdowns.matter.views.activities.oauth.OAuthActivity
 import javax.inject.Inject
 
 class LogInDialogFragment : android.support.v4.app.DialogFragment() {

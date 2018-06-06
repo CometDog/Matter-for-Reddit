@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".views.activities.OAuthActivity"
+            android:name=".views.activities.oauth.OAuthActivity"
             android:alwaysRetainTaskState="true" />
     </application>
 
