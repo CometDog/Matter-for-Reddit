@@ -63,8 +63,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun recreate() {
-        supportFragmentManager.beginTransaction()
-            .remove(supportFragmentManager.findFragmentByTag(SubmissionFragment.FRAGMENT_TAG)).commitNow()
+        supportFragmentManager.findFragmentByTag(SubmissionFragment.FRAGMENT_TAG)?.run 
+            supportFragmentManager.beginTransaction().remove(this).commitNow()
+        }
         super.recreate()
     }
 }
