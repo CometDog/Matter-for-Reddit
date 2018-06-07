@@ -47,7 +47,7 @@ dependencies {
     implementation "com.android.support:design:28.0.0-alpha3"
     implementation 'com.android.support.constraint:constraint-layout:1.1.1'
     implementation "com.android.support:support-vector-drawable:28.0.0-alpha3"
-    implementation "com.android.support:cardview-v7:28.0.0-alpha1"
+    implementation "com.android.support:cardview-v7:28.0.0-alpha3"
 
     //JRAW
     implementation "net.dean.jraw:JRAW:1.1.0"
