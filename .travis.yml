@@ -1,5 +1,4 @@
 env:
-  ANDROID_HOME: $HOME/android-sdk
   reddit:
     clientid:
       secure: W5BWiYC/0R2bKKPsulz/lpVokuk73gcjYEIJvphPvCHOK5hWBgv/VrEUuoJGGwtIJeTjZ4GjdBGjFsagarhyQrz59U+NFkhWIHo6S4xtYFAzO+C7cBimlKcDra/0R6XOXv4gjDbZlaaeTimE8uOgaPURxvZnw1/ZhRldavJOzlu43sPRXvJ/rP7PojUxH6sYByVJ14n6tWccYx5K2MkfyiIxcHfTqbmxEKOt0fLV9TeHZzNeFcdr3XilC6tWO5roqCPn+Ml91627X8BNO9v+PAAhiULfHLmy574KON+mTYoATyWKGgEe8qnne5qwLzDzPwQYHC6XpnKrw5757ivikUWhzBEmG2XJ3LUZCVCHHCwOHJzabZWgV8PPCP4MMwXLBlIrNDzLqZS++50dJBr56Vpsvxs/ITH5QGZo72ofWCfemnu5PZiORwQu+80vDBz4PXpb4W9nzIvTM2TT1XmC0ydzy6x19cw4dZeQtx6BUMlhXeRMCfzykYbGBwADVIf0mneWvEgFRl3WfzuH00R+8m0FwiZ/xRmTnN82uy+Cmy4l2A2X+pxRf2rSv+WI9d8NJxP3BXjgiGOVdAxp3FhoDO6iFZVFuD8DXzK7DxrGtaSu4XSPd6whECQgKe12CB4XkTryq4xBzMbX0cg9bH0f/oryfzNF3DYzK3EbZQnaL9o=
@@ -10,28 +9,16 @@ env:
 
 language: android
 jdk: oraclejdk8
-before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-cache:
-  directories:
-    - $HOME/android-sdk-dl
-    - $HOME/android-sdk
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-    - $HOME/.android/build-cache
+android:
+  components:
+    - tools
+    - platform-tools
+
+    - build-tools-28.0.0
+    - android-28
 
 before_install:
-  - yes | sdkmanager "platforms;android-28"
-
-install:
-  - if test ! -e $HOME/android-sdk-dl/sdk-tools.zip ; then curl https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip > $HOME/android-sdk-dl/sdk-tools.zip ; fi
-  - unzip -qq -n $HOME/android-sdk-dl/sdk-tools.zip -d $HOME/android-sdk
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'tools' > /dev/null
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'platform-tools' > /dev/null
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'build-tools;28.0.0' > /dev/null
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'platforms;android-28' > /dev/null
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;google;m2repository' > /dev/null
+  - yes | sdkmanager "platforms;android-27" "platforms;android-28"
 
 before_script:
   - chmod +x gradlew
