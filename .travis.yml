@@ -36,4 +36,4 @@ install:
 before_script:
   - chmod +x gradlew
 script:
-  - ./gradlew --no-daemon buildDebug -PredditClientId=$REDDIT_CLIENT_ID -PredditUsername=$REDDIT_USERNAME -PredditRedirectUrl=$REDDIT_REDIRECT_URL
+  - ./gradlew --no-daemon build -PredditClientId=$REDDIT_CLIENT_ID -PredditUsername=$REDDIT_USERNAME -PredditRedirectUrl=$REDDIT_REDIRECT_URL
