@@ -33,7 +33,7 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
     BaseRecyclerView.BaseAdapter<SubmissionAdapter.ViewHolder, Submission>(dataSet) {
     private val thumbnailCache = BitmapLruCache()
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val submissionCardViewLayout = view.findViewById<ViewGroup>(R.id.submission_card_view_layout)!!
+        val submissionViewLayout = view.findViewById<ViewGroup>(R.id.submission_view_layout)!!
         val usernameTextView = view.findViewById<TextView>(R.id.submission_username)!!
         val postTimeTextView = view.findViewById<TextView>(R.id.submission_post_time)!!
         val typeTextView = view.findViewById<TextView>(R.id.submission_type)!!
@@ -48,6 +48,8 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
         val voteCountTextView = view.findViewById<TextView>(R.id.submission_vote_count)!!
         val downvoteImageButton = view.findViewById<ImageButton>(R.id.submission_downvote)!!
         val commentCountTextView = view.findViewById<TextView>(R.id.submission_comment_count)!!
+        val submissionContentLayout = view.findViewById<ViewGroup>(R.id.view_submission_content)!!
+        val submissionActionsLayout = view.findViewById<ViewGroup>(R.id.view_submission_actions)!!
 
         init {
             if (Matter.isRealUser()) {
@@ -66,7 +68,23 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
         ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.view_submission, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.submissionCardViewLayout.visibility = View.INVISIBLE
+        holder.submissionViewLayout.visibility = View.INVISIBLE
+
+        with(holder.submissionActionsLayout) {
+            alpha = 0.0f
+            holder.submissionContentLayout.setOnLongClickListener {
+                animate().let {
+                    if (visibility == View.GONE) {
+                        it.withStartAction { visibility = View.VISIBLE }
+                        it.alpha(1.0f)
+                    } else {
+                        it.withEndAction { visibility = View.GONE }
+                        it.alpha(0.0f)
+                    }
+                }.start()
+                true
+            }
+        }
 
         kotlin.run {
             val submission = dataSet[position]
@@ -127,7 +145,7 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
                         ), 0, it.length, 0
                     )
                 }
-                submissionCardViewLayout.visibility = View.VISIBLE
+                submissionViewLayout.visibility = View.VISIBLE
             }
         }
     }
@@ -171,32 +189,36 @@ class SubmissionAdapter(private val dataSet: List<Submission>) :
         } else {
             with(holder) {
                 imageCardView.visibility = View.GONE
-                submissionCardViewLayout.visibility = View.VISIBLE
+                submissionViewLayout.visibility = View.VISIBLE
             }
         }
     }
 
     private fun setScore(holder: ViewHolder, submission: Submission) {
-        with(submission) {
-            holder.voteCountTextView.text = if (isScoreHidden) "?" else score.toString()
-        }
+        holder.voteCountTextView.text = if (submission.isScoreHidden) "?" else truncateNumber(submission.score)
     }
 
     private fun setCommentCount(holder: ViewHolder, submission: Submission) {
-        holder.commentCountTextView.text = submission.commentCount.toString()
+        holder.commentCountTextView.text = truncateNumber(submission.commentCount)
     }
 
-    private fun getTimeDiffString(submissionDate: Date): String {
-        return kotlin.run {
-            val timeDiffSeconds = (Date().time - submissionDate.time) / 1000L
-            val timeUnit = TimeUnit.SECONDS
-            when {
-                timeDiffSeconds < 60 -> timeDiffSeconds.toString().plus("s")
-                timeDiffSeconds < 3600 -> TimeUnit.MINUTES.convert(timeDiffSeconds, timeUnit).toString().plus("m")
-                timeDiffSeconds < 86400 -> TimeUnit.HOURS.convert(timeDiffSeconds, timeUnit).toString().plus("h")
-                timeDiffSeconds < 31536000 -> TimeUnit.DAYS.convert(timeDiffSeconds, timeUnit).toString().plus("d")
-                else -> (TimeUnit.DAYS.convert(timeDiffSeconds, timeUnit) / 365).toString().plus("y")
-            }
+    private fun getTimeDiffString(submissionDate: Date): String = kotlin.run {
+        val timeDiffSeconds = (Date().time - submissionDate.time) / 1000L
+        val timeUnit = TimeUnit.SECONDS
+        when {
+            timeDiffSeconds < 60 -> timeDiffSeconds.toString().plus("s")
+            timeDiffSeconds < 3600 -> TimeUnit.MINUTES.convert(timeDiffSeconds, timeUnit).toString().plus("m")
+            timeDiffSeconds < 86400 -> TimeUnit.HOURS.convert(timeDiffSeconds, timeUnit).toString().plus("h")
+            timeDiffSeconds < 31536000 -> TimeUnit.DAYS.convert(timeDiffSeconds, timeUnit).toString().plus("d")
+            else -> (TimeUnit.DAYS.convert(timeDiffSeconds, timeUnit) / 365).toString().plus("y")
+        }
+    }
+
+    private fun truncateNumber(number: Int) = with(number) {
+        when {
+            number > 1000 -> number.toString().dropLast(3).plus("k")
+            number > 1000000 -> number.toString().dropLast(6).plus("m")
+            else -> number.toString()
         }
     }
 }

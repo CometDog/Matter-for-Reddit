@@ -36,7 +36,9 @@ class ProfileBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private fun setUpLogInView() = with(view!!.findViewById<TextView>(R.id.profile_username)) {
         text = getString(R.string.log_in)
-        navigator.showLogInDialogView()
+        setOnClickListener {
+            navigator.showLogInDialogView()
+        }
     }
 
     private fun setUpLogOutView() = view!!.findViewById<ViewGroup>(R.id.profile_logout_layout).setOnClickListener({
