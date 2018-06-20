@@ -54,7 +54,7 @@ dependencies {
     implementation "net.dean.jraw:JRAW-Android:1.1.0"
 
     //Room
-    implementation "android.arch.persistence.room:runtime:1.1.0"
+    implementation "android.arch.persistence.room:runtime:1.1.1"
     kapt "android.arch.persistence.room:compiler:1.1.0"
 
     //Dagger
