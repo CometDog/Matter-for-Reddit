@@ -38,7 +38,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     //Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.41"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.51"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.5"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:0.22.5"
 
