@@ -1,0 +1,60 @@
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "07:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: com.google.dagger:dagger-android-processor
+    versions:
+    - 2.31.2
+    - "2.32"
+    - "2.33"
+    - "2.34"
+    - 2.34.1
+    - "2.35"
+  - dependency-name: com.google.dagger:dagger-compiler
+    versions:
+    - 2.31.2
+    - "2.32"
+    - "2.33"
+    - "2.34"
+    - 2.34.1
+    - "2.35"
+  - dependency-name: com.google.dagger:dagger
+    versions:
+    - 2.31.2
+    - "2.32"
+    - "2.33"
+    - "2.34"
+    - 2.34.1
+  - dependency-name: com.google.dagger:dagger-android-support
+    versions:
+    - 2.31.2
+    - "2.32"
+    - "2.33"
+    - "2.34"
+    - 2.34.1
+  - dependency-name: org.jetbrains.kotlin:kotlin-stdlib-jdk7
+    versions:
+    - 1.4.21-2
+    - 1.4.30
+    - 1.4.31
+    - 1.4.32
+  - dependency-name: org.jetbrains.kotlin:kotlin-gradle-plugin
+    versions:
+    - 1.4.21-2
+    - 1.4.30
+    - 1.4.31
+    - 1.4.32
+  - dependency-name: com.android.tools.build:gradle
+    versions:
+    - 4.1.2
+  - dependency-name: org.jetbrains.kotlinx:kotlinx-coroutines-android
+    versions:
+    - 1.4.2-native-mt
+  - dependency-name: org.jetbrains.kotlinx:kotlinx-coroutines-core
+    versions:
+    - 1.4.2-native-mt
